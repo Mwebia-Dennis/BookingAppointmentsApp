@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
@@ -27,7 +28,7 @@ public class BusinessDaysAdapter extends RecyclerView.Adapter<BusinessDaysAdapte
 
     private final List<BusinessDay> businessDayList;
     private final Context context;
-    public static final long HOUR = 3600*1000;
+//    public static final long HOUR = 3600*1000;
     public static final DateFormat sdf = new SimpleDateFormat("hh:mm a");
     public BusinessDaysAdapter (Context context, List<BusinessDay> businessDayList) {
         this.businessDayList = businessDayList;
@@ -46,10 +47,24 @@ public class BusinessDaysAdapter extends RecyclerView.Adapter<BusinessDaysAdapte
 
         BusinessDay businessDay = businessDayList.get(position);
         holder.dayCheckbox.setText(businessDay.getDay());
+        enableViews(holder.hoursRV,false);//disable views initially
+        holder.dayCheckbox.setOnCheckedChangeListener((compoundButton, isChecked) -> {
+            enableViews(holder.hoursRV, isChecked);//disable or enable views on checkbox change
+        });
 
-
-        ArrayList<BusinessHours> businessHourList = getHours();
+        ArrayList<BusinessHours> businessHourList = businessDay.getListOfBusinessHours();
         updateUi(holder,businessHourList);
+    }
+
+    private void enableViews(View v, boolean enabled) {
+        //disable all children views recursively
+        if (v instanceof ViewGroup) {
+            ViewGroup vg = (ViewGroup) v;
+            for (int i = 0;i<vg.getChildCount();i++) {
+                enableViews(vg.getChildAt(i), enabled);
+            }
+        }
+        v.setEnabled(enabled);
     }
 
     private void updateUi(ViewHolder holder, ArrayList<BusinessHours> list) {
@@ -59,34 +74,7 @@ public class BusinessDaysAdapter extends RecyclerView.Adapter<BusinessDaysAdapte
         holder.hoursRV.setAdapter(adapter);
     }
 
-    private ArrayList<BusinessHours> getHours() {
-        ArrayList<BusinessHours> list = new ArrayList<>();
-        list.clear();
 
-        Calendar startTime = Calendar.getInstance();
-        startTime.set(Calendar.HOUR_OF_DAY, 8);
-        startTime.set(Calendar.MINUTE, 0);
-        startTime.set(Calendar.SECOND, 0);
-        startTime.set(Calendar.MILLISECOND, 0);
-
-
-        Calendar endTime = Calendar.getInstance();
-        endTime.set(Calendar.HOUR_OF_DAY, 9);
-        endTime.set(Calendar.MINUTE, 0);
-        endTime.set(Calendar.SECOND, 0);
-        endTime.set(Calendar.MILLISECOND, 0);
-        list.add(new BusinessHours(sdf.format(startTime.getTime()),
-                sdf.format(endTime.getTime())));
-        return list;
-    }
-
-    public void addBusinessHours() {
-
-        //get last hour end time
-        //add an hour and use it as start time to next hour
-        //add 2 hours to use the it as end time
-
-    }
 
 
     @Override

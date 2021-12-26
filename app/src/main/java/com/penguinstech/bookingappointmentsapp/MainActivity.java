@@ -7,8 +7,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,8 +20,9 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
 
-    CompanyAdapter adapter;
+
     List<Company> companyList;
+    FirebaseFirestore db;//firestore instance
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,21 +48,35 @@ public class MainActivity extends AppCompatActivity {
 
     private void init() {
 
+        FirebaseApp.initializeApp(this);
+        db = FirebaseFirestore.getInstance();
         companyList = new ArrayList<>();
-        RecyclerView recyclerView = findViewById(R.id.mainRv);
-        recyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this, LinearLayoutManager.VERTICAL, false));
-        adapter = new CompanyAdapter(MainActivity.this, companyList);
-        recyclerView.setAdapter(adapter);
-        updateUi();
+
+        db.collection("companies")
+                .document(Util.owner).collection("company").get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (queryDocumentSnapshots.isEmpty()) {
+                        Log.d("firestore onSuccess", "LIST EMPTY");
+                    } else {
+                        // get all data and display
+
+                        //convert whole queryDocumentSnapshots to list
+                        companyList = queryDocumentSnapshots.toObjects(Company.class);
+                        updateUi();
+                    }
+
+
+                }).addOnFailureListener(e->{
+            Log.i("error", e.getMessage());
+        });
     }
 
     private void updateUi() {
 
-        for (int i = 0;i<10;i++) {
-
-            companyList.add(new Company("xyz" + String.valueOf(i), "dennis"));
-        }
-        adapter.notifyDataSetChanged();
+        RecyclerView recyclerView = findViewById(R.id.mainRv);
+        recyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this, LinearLayoutManager.VERTICAL, false));
+        CompanyAdapter adapter = new CompanyAdapter(MainActivity.this, companyList);
+        recyclerView.setAdapter(adapter);
 
     }
 }

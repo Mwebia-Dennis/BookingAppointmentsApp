@@ -22,4 +22,5 @@
     <string name="to">-</string>
     <string name="_09_00_am">09.00 AM</string>
     <string name="add_time">addTime</string>
+    <string name="business_logo">business logo</string>
 </resources>

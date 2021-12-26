@@ -23,7 +23,6 @@ public class HoursAdapter  extends RecyclerView.Adapter<HoursAdapter.ViewHolder>
 
     private final List<BusinessHours> businessHourList;
     private final Context context;
-    private final HoursAdapter classContext = this;
 
     public HoursAdapter (Context context, List<BusinessHours> businessHourList) {
         this.businessHourList = businessHourList;
@@ -75,8 +74,6 @@ public class HoursAdapter  extends RecyclerView.Adapter<HoursAdapter.ViewHolder>
                 Calendar nweStartTime = Calendar.getInstance();
                 nweStartTime.set(Calendar.HOUR_OF_DAY, hr);
                 nweStartTime.set(Calendar.MINUTE, mins);
-                nweStartTime.set(Calendar.SECOND, 0);
-                nweStartTime.set(Calendar.MILLISECOND, 0);
 
                 Calendar newEndTime = (Calendar) nweStartTime.clone();
                 newEndTime.set(Calendar.HOUR_OF_DAY, hr + 1);
@@ -88,9 +85,13 @@ public class HoursAdapter  extends RecyclerView.Adapter<HoursAdapter.ViewHolder>
             }
         });
         holder.removeHourBtn.setOnClickListener(v->{
-            businessHourList.remove(position);
-            this.notifyDataSetChanged();
-            Toast.makeText(context, "Hour removed", Toast.LENGTH_SHORT).show();
+            //remove all hours except the first one
+            if(businessHourList.size() > 1) {
+
+                businessHourList.remove(position);
+                this.notifyDataSetChanged();
+            }
+//            Toast.makeText(context, "Hour removed", Toast.LENGTH_SHORT).show();
         });
     }
 
@@ -117,8 +118,6 @@ public class HoursAdapter  extends RecyclerView.Adapter<HoursAdapter.ViewHolder>
             Calendar newStartTime = Calendar.getInstance();
             newStartTime.set(Calendar.HOUR_OF_DAY, selectedHour);
             newStartTime.set(Calendar.MINUTE, selectedMinute);
-            newStartTime.set(Calendar.SECOND, 0);
-            newStartTime.set(Calendar.MILLISECOND, 0);
 
             Calendar previousTime = null;
             Calendar nextStartTime = null;
@@ -129,8 +128,6 @@ public class HoursAdapter  extends RecyclerView.Adapter<HoursAdapter.ViewHolder>
                 previousTime = Calendar.getInstance();
                 previousTime.set(Calendar.HOUR, Integer.parseInt(endTime.split(":")[0]));
                 previousTime.set(Calendar.MINUTE, Integer.parseInt(endTime.split(":")[1].split(" ")[0]));
-                previousTime.set(Calendar.SECOND, 0);
-                previousTime.set(Calendar.MILLISECOND, 0);
                 previousTime.set(Calendar.AM_PM,
                         endTime.split(":")[1].split(" ")[1].toLowerCase().equals("am")?Calendar.AM:Calendar.PM
                         );
@@ -143,8 +140,6 @@ public class HoursAdapter  extends RecyclerView.Adapter<HoursAdapter.ViewHolder>
                 nextStartTime = Calendar.getInstance();
                 nextStartTime.set(Calendar.HOUR, Integer.parseInt(startTime.split(":")[0]));
                 nextStartTime.set(Calendar.MINUTE, Integer.parseInt(startTime.split(":")[1].split(" ")[0]));
-                nextStartTime.set(Calendar.SECOND, 0);
-                nextStartTime.set(Calendar.MILLISECOND, 0);
                 nextStartTime.set(Calendar.AM_PM,
                         startTime.split(":")[1].split(" ")[1].toLowerCase().equals("am")?Calendar.AM:Calendar.PM
                 );
@@ -198,11 +193,9 @@ public class HoursAdapter  extends RecyclerView.Adapter<HoursAdapter.ViewHolder>
             Calendar newEndTime = Calendar.getInstance();
             newEndTime.set(Calendar.HOUR_OF_DAY, selectedHour);
             newEndTime.set(Calendar.MINUTE, selectedMinute);
-            newEndTime.set(Calendar.SECOND, 0);
-            newEndTime.set(Calendar.MILLISECOND, 0);
 
             //get the start time of current holder
-            String currentStartTime = businessHourList.get(position-1).getStartTime();
+            String currentStartTime = businessHourList.get(position).getStartTime();
             Calendar previousTime = Calendar.getInstance();
             previousTime.set(Calendar.HOUR, Integer.parseInt(currentStartTime.split(":")[0]));
             previousTime.set(Calendar.MINUTE, Integer.parseInt(currentStartTime.split(":")[1].split(" ")[0]));
@@ -219,8 +212,6 @@ public class HoursAdapter  extends RecyclerView.Adapter<HoursAdapter.ViewHolder>
                 nextStartTime = Calendar.getInstance();
                 nextStartTime.set(Calendar.HOUR, Integer.parseInt(startTime.split(":")[0]));
                 nextStartTime.set(Calendar.MINUTE, Integer.parseInt(startTime.split(":")[1].split(" ")[0]));
-                nextStartTime.set(Calendar.SECOND, 0);
-                nextStartTime.set(Calendar.MILLISECOND, 0);
                 nextStartTime.set(Calendar.AM_PM,
                         startTime.split(":")[1].split(" ")[1].toLowerCase().equals("am")?Calendar.AM:Calendar.PM
                 );
@@ -248,7 +239,7 @@ public class HoursAdapter  extends RecyclerView.Adapter<HoursAdapter.ViewHolder>
             this.notifyDataSetChanged();
 
         }, mcurrentTime.get(Calendar.HOUR_OF_DAY), mcurrentTime.get(Calendar.MINUTE), false);
-        timePickerDialog.setTitle("Select Start Time");
+        timePickerDialog.setTitle("Select End Time");
         timePickerDialog.show();
     }
 
