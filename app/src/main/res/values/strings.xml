@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">BookingApp</string>
+    <string name="company_name_penguins_technologies">Company Name: Penguins Technologies</string>
+    <string name="owner_dennis_mwebia">Owner: Dennis Mwebia</string>
+    <string name="add_company">Add Company</string>
+    <string name="save">save</string>
+    <string name="business_name">Business Name</string>
+    <string name="business_description">Business Description</string>
+    <string name="add_logo">Add Logo</string>
+    <string name="add_business_photo">Add Business Photo</string>
+    <string name="basic_information">Basic Information</string>
+    <string name="business_address">Business Address</string>
+    <string name="contact_information">Contact Information</string>
+    <string name="phone_number">Phone Number</string>
+    <string name="email">Email</string>
+    <string name="website">Website</string>
+    <string name="instagram">Instagram</string>
+    <string name="facebook">Facebook</string>
+    <string name="business_hours">Business Hours</string>
+    <string name="sunday">Sunday</string>
+    <string name="_08_00_am">08.00 AM</string>
+    <string name="to">-</string>
+    <string name="_09_00_am">09.00 AM</string>
+    <string name="add_time">addTime</string>
+</resources>
