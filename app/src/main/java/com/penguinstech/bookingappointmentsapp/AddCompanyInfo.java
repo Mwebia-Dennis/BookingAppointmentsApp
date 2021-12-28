@@ -225,6 +225,7 @@ public class AddCompanyInfo extends AppCompatActivity {
 
                         //add logo image
                         if(logoUri != null) {
+                            Toast.makeText(AddCompanyInfo.this, "Logo image saving in background", Toast.LENGTH_SHORT).show();
                             storageRef.child(UUID.randomUUID().toString()).putFile(logoUri)
                                     .addOnCompleteListener(task -> {
 
@@ -252,6 +253,7 @@ public class AddCompanyInfo extends AppCompatActivity {
 
 
                         if(businessPhotoUri != null) {
+                            Toast.makeText(AddCompanyInfo.this, "Business Photo saving in background", Toast.LENGTH_SHORT).show();
                             storageRef.child(UUID.randomUUID().toString()).putFile(businessPhotoUri)
                                     .addOnCompleteListener(task -> {
 
@@ -274,6 +276,8 @@ public class AddCompanyInfo extends AppCompatActivity {
                                         Log.i("photo upload: ", "failed");
                                     });
                         }
+
+                        onBackPressed();
                     })
                     .addOnFailureListener(e -> {
                         Log.d("Adding Data", "Failed");

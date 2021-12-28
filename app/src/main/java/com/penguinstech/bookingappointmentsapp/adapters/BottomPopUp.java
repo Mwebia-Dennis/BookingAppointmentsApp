@@ -109,17 +109,21 @@ public class BottomPopUp extends BottomSheetDialogFragment {
                 .document(companyId)
                 .collection("services").get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
+
+                    v.findViewById(R.id.loader).setVisibility(View.GONE);
                     if (!queryDocumentSnapshots.isEmpty()) {
 
                         // get all data and display
 
                         //convert whole queryDocumentSnapshots to list
-                        v.findViewById(R.id.loader).setVisibility(View.GONE);
                         List<Service> serviceList = queryDocumentSnapshots.toObjects(Service.class);
                         RecyclerView containerRv = v.findViewById(R.id.containerRv);
                         containerRv.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false));
                         ServicesAdapter adapter = new ServicesAdapter(context, serviceList);
                         containerRv.setAdapter(adapter);
+                    }else {
+                        Toast.makeText(context, "You have 0 services", Toast.LENGTH_SHORT).show();
+                        bottomPopUp.dismiss();
                     }
 
 
