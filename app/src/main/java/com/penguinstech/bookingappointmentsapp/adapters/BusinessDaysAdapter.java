@@ -1,27 +1,22 @@
-package com.penguinstech.bookingappointmentsapp;
+package com.penguinstech.bookingappointmentsapp.adapters;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.ImageButton;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.snackbar.Snackbar;
+import com.penguinstech.bookingappointmentsapp.R;
+import com.penguinstech.bookingappointmentsapp.model.BusinessDay;
+import com.penguinstech.bookingappointmentsapp.model.BusinessHours;
 
-import java.sql.Date;
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 public class BusinessDaysAdapter extends RecyclerView.Adapter<BusinessDaysAdapter.ViewHolder> {
@@ -47,13 +42,28 @@ public class BusinessDaysAdapter extends RecyclerView.Adapter<BusinessDaysAdapte
 
         BusinessDay businessDay = businessDayList.get(position);
         holder.dayCheckbox.setText(businessDay.getDay());
-        enableViews(holder.hoursRV,false);//disable views initially
+
+
+
+        holder.dayCheckbox.setChecked(businessDay.isChecked());
+        enableViews(holder.hoursRV,businessDay.isChecked());//disable views initially
+
         holder.dayCheckbox.setOnCheckedChangeListener((compoundButton, isChecked) -> {
+            businessDay.setChecked(isChecked);
             enableViews(holder.hoursRV, isChecked);//disable or enable views on checkbox change
+
+            //remove hours if checkbox is unchecked
+            if (!isChecked) {
+
+                ArrayList<BusinessHours> list = new ArrayList<>();
+                list.add(businessDay.getListOfBusinessHours().get(0));
+                businessDay.setListOfBusinessHours(list);
+                updateUi(holder, businessDay.getListOfBusinessHours());
+            }
+
         });
 
-        ArrayList<BusinessHours> businessHourList = businessDay.getListOfBusinessHours();
-        updateUi(holder,businessHourList);
+        updateUi(holder,businessDay.getListOfBusinessHours());
     }
 
     private void enableViews(View v, boolean enabled) {
@@ -65,6 +75,7 @@ public class BusinessDaysAdapter extends RecyclerView.Adapter<BusinessDaysAdapte
             }
         }
         v.setEnabled(enabled);
+        v.setClickable(enabled);
     }
 
     private void updateUi(ViewHolder holder, ArrayList<BusinessHours> list) {

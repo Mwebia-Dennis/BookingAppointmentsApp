@@ -1,9 +1,13 @@
-package com.penguinstech.bookingappointmentsapp;
+package com.penguinstech.bookingappointmentsapp.model;
 
-public class BusinessHours {
+import java.io.Serializable;
 
-    private final String startTime;
-    private final String endTime;
+public class BusinessHours implements Serializable {
+
+    private String startTime;
+    private String endTime;
+
+    public BusinessHours() {}//needed for firebase
 
     public BusinessHours(String startTime, String endTime) {
         this.startTime = startTime;

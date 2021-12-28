@@ -1,4 +1,4 @@
-package com.penguinstech.bookingappointmentsapp;
+package com.penguinstech.bookingappointmentsapp.model;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -14,6 +14,9 @@ public class Util {
     public static String owner = "user1";
     public static String generateUniqueId() {
         return UUID.randomUUID().toString();
+    }
+    public static String bold(String text) {
+        return String.format("<b>%s</b>", text);
     }
 
 }

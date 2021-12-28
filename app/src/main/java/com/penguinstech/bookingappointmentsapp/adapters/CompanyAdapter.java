@@ -1,11 +1,10 @@
-package com.penguinstech.bookingappointmentsapp;
+package com.penguinstech.bookingappointmentsapp.adapters;
 
 import android.content.Context;
 import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -14,6 +13,9 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.penguinstech.bookingappointmentsapp.CompanyDetails;
+import com.penguinstech.bookingappointmentsapp.R;
+import com.penguinstech.bookingappointmentsapp.model.Company;
 
 import java.util.List;
 
@@ -46,8 +48,9 @@ public class CompanyAdapter extends RecyclerView.Adapter<CompanyAdapter.ViewHold
 
         }
         holder.itemView.setOnClickListener(v -> {
-//            holder.itemView.getContext().startActivity(new Intent(holder.itemView.getContext(), AddCompanyInfo.class));
-            Toast.makeText(context, "Service under construction", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(holder.itemView.getContext(), CompanyDetails.class);
+            intent.putExtra("companyDetails", company);
+            holder.itemView.getContext().startActivity(intent);
         });
     }
 

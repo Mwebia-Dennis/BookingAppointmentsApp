@@ -1,4 +1,4 @@
-package com.penguinstech.bookingappointmentsapp;
+package com.penguinstech.bookingappointmentsapp.adapters;
 
 import android.app.TimePickerDialog;
 import android.content.Context;
@@ -8,13 +8,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.TimePicker;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.snackbar.Snackbar;
+import com.penguinstech.bookingappointmentsapp.R;
+import com.penguinstech.bookingappointmentsapp.model.BusinessHours;
 
 import java.util.Calendar;
 import java.util.List;

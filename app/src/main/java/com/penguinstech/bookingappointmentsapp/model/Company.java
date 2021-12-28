@@ -1,11 +1,22 @@
-package com.penguinstech.bookingappointmentsapp;
+package com.penguinstech.bookingappointmentsapp.model;
 
-public class Company {
+import java.io.Serializable;
+import java.util.ArrayList;
 
-    private String companyName, ownerName, description, logo, photo, address, phone, email, website, instagram, facebook;
+public class Company implements Serializable {
 
+    private String firebaseId, companyName, ownerName, description, logo, photo, address, phone, email, website, instagram, facebook;
+    ArrayList<BusinessDay> businessDayList;
 
     public Company() {}
+
+    public String getFirebaseId() {
+        return firebaseId;
+    }
+
+    public void setFirebaseId(String firebaseId) {
+        this.firebaseId = firebaseId;
+    }
 
     public String getCompanyName() {
         return companyName;
@@ -93,5 +104,14 @@ public class Company {
 
     public void setFacebook(String facebook) {
         this.facebook = facebook;
+    }
+
+
+    public ArrayList<BusinessDay> getBusinessDayList() {
+        return businessDayList;
+    }
+
+    public void setBusinessDayList(ArrayList<BusinessDay> businessDayList) {
+        this.businessDayList = businessDayList;
     }
 }

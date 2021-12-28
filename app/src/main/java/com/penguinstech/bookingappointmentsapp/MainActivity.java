@@ -13,6 +13,9 @@ import android.view.MenuItem;
 
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.penguinstech.bookingappointmentsapp.adapters.CompanyAdapter;
+import com.penguinstech.bookingappointmentsapp.model.Company;
+import com.penguinstech.bookingappointmentsapp.model.Util;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,9 +54,20 @@ public class MainActivity extends AppCompatActivity {
         FirebaseApp.initializeApp(this);
         db = FirebaseFirestore.getInstance();
         companyList = new ArrayList<>();
+        updateUi();
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateUi();
+    }
+
+    private void updateUi() {
 
         db.collection("companies")
-                .document(Util.owner).collection("company").get()
+                .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     if (queryDocumentSnapshots.isEmpty()) {
                         Log.d("firestore onSuccess", "LIST EMPTY");
@@ -62,21 +76,16 @@ public class MainActivity extends AppCompatActivity {
 
                         //convert whole queryDocumentSnapshots to list
                         companyList = queryDocumentSnapshots.toObjects(Company.class);
-                        updateUi();
+
+                        RecyclerView recyclerView = findViewById(R.id.mainRv);
+                        recyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this, LinearLayoutManager.VERTICAL, false));
+                        CompanyAdapter adapter = new CompanyAdapter(MainActivity.this, companyList);
+                        recyclerView.setAdapter(adapter);
                     }
 
 
                 }).addOnFailureListener(e->{
             Log.i("error", e.getMessage());
         });
-    }
-
-    private void updateUi() {
-
-        RecyclerView recyclerView = findViewById(R.id.mainRv);
-        recyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this, LinearLayoutManager.VERTICAL, false));
-        CompanyAdapter adapter = new CompanyAdapter(MainActivity.this, companyList);
-        recyclerView.setAdapter(adapter);
-
     }
 }

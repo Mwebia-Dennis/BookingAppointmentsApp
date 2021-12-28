@@ -23,4 +23,13 @@
     <string name="_09_00_am">09.00 AM</string>
     <string name="add_time">addTime</string>
     <string name="business_logo">business logo</string>
+    <string name="book_appointment">Book Appointment</string>
+    <string name="add_service">Add Service</string>
+    <string name="all_services">All Services</string>
+    <string name="price">Price</string>
+    <string name="hours">Hours</string>
+    <string name="minutes">Minutes</string>
+    <string name="duration">Duration</string>
+    <string name="service_name">Service Name</string>
+    <string name="all_company_services">All Company Services</string>
 </resources>

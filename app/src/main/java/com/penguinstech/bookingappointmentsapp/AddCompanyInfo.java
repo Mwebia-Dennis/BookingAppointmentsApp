@@ -1,7 +1,5 @@
 package com.penguinstech.bookingappointmentsapp;
 
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -29,7 +27,11 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.squareup.picasso.Picasso;
+import com.penguinstech.bookingappointmentsapp.adapters.BusinessDaysAdapter;
+import com.penguinstech.bookingappointmentsapp.model.BusinessDay;
+import com.penguinstech.bookingappointmentsapp.model.BusinessHours;
+import com.penguinstech.bookingappointmentsapp.model.Company;
+import com.penguinstech.bookingappointmentsapp.model.Util;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -60,7 +62,7 @@ public class AddCompanyInfo extends AppCompatActivity {
 
         FirebaseApp.initializeApp(this);
         db = FirebaseFirestore.getInstance();
-        storageRef = FirebaseStorage.getInstance().getReference("files/"+Util.owner);
+        storageRef = FirebaseStorage.getInstance().getReference("files/"+ Util.owner);
         listOfBusinessDays = new ArrayList<>();
         RecyclerView recyclerView = findViewById(R.id.business_days);
         recyclerView.setLayoutManager(new LinearLayoutManager(AddCompanyInfo.this, LinearLayoutManager.VERTICAL, false));
@@ -111,10 +113,9 @@ public class AddCompanyInfo extends AppCompatActivity {
 
     private void loadBusinessDays() {
         final String[] daysOfWeek = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
-        ArrayList<BusinessHours> list = getHours();
         for (String day : daysOfWeek) {
 
-            listOfBusinessDays.add(new BusinessDay(day, list, false));
+            listOfBusinessDays.add(new BusinessDay(day, getHours(), false));
         }
         businessDaysAdapter.notifyDataSetChanged();
     }
@@ -153,7 +154,7 @@ public class AddCompanyInfo extends AppCompatActivity {
             onBackPressed();
             return true;
         } else if (item.getItemId() == R.id.save_menu_btn) {
-            //validate form, business name
+            //save details
 
             saveCompanyDetails();
 
@@ -181,6 +182,7 @@ public class AddCompanyInfo extends AppCompatActivity {
         EditText instagram = findViewById(R.id.instagram);
         EditText facebook = findViewById(R.id.facebook);
         if(name.getText().toString().trim().equals("")) {
+            //validate form, business name
             name.setError("this field is required");
             name.requestFocus();
         }else {
@@ -209,14 +211,12 @@ public class AddCompanyInfo extends AppCompatActivity {
             if(!facebook.getText().toString().trim().equals("")) {
                 company.setFacebook(facebook.getText().toString().trim());
             }
-
-            company.setLogo("");
-            company.setPhoto("");
             company.setOwnerName(Util.owner);
+            company.setBusinessDayList(listOfBusinessDays);
 
             Toast.makeText(this, "loading please wait...", Toast.LENGTH_SHORT).show();
-            DocumentReference ref = db.collection("companies")
-                    .document(Util.owner).collection("company").document();
+            DocumentReference ref = db.collection("companies").document();
+            company.setFirebaseId(ref.getId());
 
             ref.set(company)
                     .addOnSuccessListener(documentReference -> {
@@ -230,7 +230,6 @@ public class AddCompanyInfo extends AppCompatActivity {
 
                                         task.getResult().getStorage().getDownloadUrl().addOnSuccessListener(uri -> {
                                             db.collection("companies")
-                                                    .document(Util.owner).collection("company")
                                                     .document(ref.getId()).update("logo", uri.toString()).addOnSuccessListener(aVoid->{
 
                                                         Log.i("logo upload: ", "Successful");
@@ -258,7 +257,6 @@ public class AddCompanyInfo extends AppCompatActivity {
 
                                         task.getResult().getStorage().getDownloadUrl().addOnSuccessListener(uri -> {
                                             db.collection("companies")
-                                                    .document(Util.owner).collection("company")
                                                     .document(ref.getId()).update("photo", uri.toString()).addOnSuccessListener(aVoid->{
 
                                                 Log.i("photo upload: ", "Successful");

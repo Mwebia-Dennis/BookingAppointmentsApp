@@ -1,17 +1,28 @@
-package com.penguinstech.bookingappointmentsapp;
+package com.penguinstech.bookingappointmentsapp.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class BusinessDay {
+public class BusinessDay implements Serializable {
 
-    private final String day;
-    private final ArrayList<BusinessHours> listOfBusinessHours;
+    private String day;
+    private ArrayList<BusinessHours> listOfBusinessHours;
     private boolean isChecked;
 
     public BusinessDay(String day, ArrayList<BusinessHours> listOfBusinessHours, boolean isChecked) {
         this.day = day;
         this.listOfBusinessHours = listOfBusinessHours;
         this.isChecked = isChecked;
+    }
+
+    public BusinessDay(){}//required because of firebase
+
+    public void setDay(String day) {
+        this.day = day;
+    }
+
+    public void setListOfBusinessHours(ArrayList<BusinessHours> listOfBusinessHours) {
+        this.listOfBusinessHours = listOfBusinessHours;
     }
 
     public String getDay() {
