@@ -39,6 +39,8 @@ public class CompanyDetails extends AppCompatActivity {
 
     ArrayList<String> list = new ArrayList<>();
     Company company;
+    BusinessDetailsAdapter adapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,13 +53,27 @@ public class CompanyDetails extends AppCompatActivity {
 
         company = (Company) getIntent().getSerializableExtra("companyDetails");
 
-        CircleImageView imageView = findViewById(R.id.profile_image);
-        TextView nameTv = findViewById(R.id.name);
-        TextView hoursTv = findViewById(R.id.business_hours_tv);
-        BusinessDetailsAdapter adapter = new BusinessDetailsAdapter(this, list);
+        adapter = new BusinessDetailsAdapter(this, list);
         RecyclerView recyclerView = findViewById(R.id.detailsRv);
         recyclerView.setLayoutManager(new LinearLayoutManager(CompanyDetails.this, LinearLayoutManager.VERTICAL, false));
         recyclerView.setAdapter(adapter);
+
+        findViewById(R.id.bookAppointment).setOnClickListener(v-> {
+            Intent i = new Intent(CompanyDetails.this, SelectServicesActivity.class);
+            i.putExtra("companyId", company.getFirebaseId());
+            startActivity(i);
+        });
+
+        updateUi();
+
+    }
+
+    private  void updateUi() {
+
+
+        CircleImageView imageView = findViewById(R.id.profile_image);
+        TextView nameTv = findViewById(R.id.name);
+        TextView hoursTv = findViewById(R.id.business_hours_tv);
 
         //set up data on the UI (am using html to display data)
         nameTv.setText("Name: "+company.getCompanyName());
@@ -93,7 +109,6 @@ public class CompanyDetails extends AppCompatActivity {
         if (company.getLogo() != null && !company.getLogo().equals("")) {
             Glide.with(CompanyDetails.this).load(company.getLogo()).into(imageView);
         }
-
         if(company.getAddress() != null && !company.getAddress().equals("")){
             list.add("Address: "+company.getAddress());
         }
@@ -121,7 +136,6 @@ public class CompanyDetails extends AppCompatActivity {
 
         adapter.notifyDataSetChanged();
     }
-
 
 
     @Override

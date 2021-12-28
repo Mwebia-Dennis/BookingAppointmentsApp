@@ -32,4 +32,12 @@
     <string name="duration">Duration</string>
     <string name="service_name">Service Name</string>
     <string name="all_company_services">All Company Services</string>
+    <string name="select_service">select service</string>
+    <string name="remove_selected_service">remove selected service</string>
+    <string name="select_one_or_more_services">Select one or more services</string>
+    <string name="selected_services">Selected Services</string>
+    <string name="next">Next</string>
+    <string name="select_date">Select Date</string>
+    <string name="select_date_and_time">Select Date And Time</string>
+    <string name="selected_date_mon_21_2021">Selected Date: Mon 21, 2021</string>
 </resources>

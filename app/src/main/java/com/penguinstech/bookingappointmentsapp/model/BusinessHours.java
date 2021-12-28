@@ -2,6 +2,7 @@ package com.penguinstech.bookingappointmentsapp.model;
 
 import java.io.Serializable;
 
+//NOTE: implementing serializable class will enable sharing of this object as a bundle between 2 activities
 public class BusinessHours implements Serializable {
 
     private String startTime;

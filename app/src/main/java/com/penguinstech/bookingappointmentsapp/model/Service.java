@@ -1,6 +1,8 @@
 package com.penguinstech.bookingappointmentsapp.model;
 
-public class Service {
+import java.io.Serializable;
+
+public class Service implements Serializable {
 
     private String firebaseId, serviceName, price, hours, mins;
 

@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -25,9 +26,13 @@ public class ServicesAdapter extends RecyclerView.Adapter<ServicesAdapter.ViewHo
 
     private final List<Service> serviceList;
     private final Context context;
-    public ServicesAdapter (Context context, List<Service> serviceList) {
+    private final boolean isSelectingService;
+    private final SelectedServiceAdapter selectedServiceAdapter;
+    public ServicesAdapter (Context context, List<Service> serviceList, boolean isSelectingService, SelectedServiceAdapter selectedServiceAdapter) {
         this.serviceList = serviceList;
         this.context = context;
+        this.isSelectingService = isSelectingService;
+        this.selectedServiceAdapter = selectedServiceAdapter;
     }
     @NonNull
     @Override
@@ -48,6 +53,16 @@ public class ServicesAdapter extends RecyclerView.Adapter<ServicesAdapter.ViewHo
                 .append(" hr(s)")
                 .append(" ").append(service.getMins()).append(" mins");
         holder.durationTv.setText(duration);
+
+        holder.selectServiceBtn.setOnClickListener(v->{
+            //add selected service to list and update UI
+            selectedServiceAdapter.serviceList.add(service);
+            selectedServiceAdapter.notifyDataSetChanged();
+        });
+
+        if(!isSelectingService) {
+            holder.selectServiceBtn.setVisibility(View.GONE);
+        }
     }
 
 
@@ -61,11 +76,13 @@ public class ServicesAdapter extends RecyclerView.Adapter<ServicesAdapter.ViewHo
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView nameTv, priceTv, durationTv;
+        ImageButton selectServiceBtn;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             nameTv = itemView.findViewById(R.id.serviceName);
             priceTv = itemView.findViewById(R.id.priceTextView);
             durationTv = itemView.findViewById(R.id.durationTv);
+            selectServiceBtn = itemView.findViewById(R.id.selectServiceBtn);
 
         }
     }

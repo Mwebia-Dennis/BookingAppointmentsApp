@@ -13,7 +13,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.BookingAppointmentsApp">
-        <activity android:name=".CompanyDetails"></activity>
+        <activity android:name=".AppointmentDatesActivity"></activity>
+        <activity android:name=".SelectServicesActivity" />
+        <activity android:name=".CompanyDetails" />
         <activity android:name=".AddCompanyInfo" />
         <activity android:name=".MainActivity">
             <intent-filter>

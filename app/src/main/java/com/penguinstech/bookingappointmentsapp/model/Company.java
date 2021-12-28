@@ -3,6 +3,7 @@ package com.penguinstech.bookingappointmentsapp.model;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+//NOTE: implementing serializable class will enable sharing of this object as a bundle between 2 activities
 public class Company implements Serializable {
 
     private String firebaseId, companyName, ownerName, description, logo, photo, address, phone, email, website, instagram, facebook;
