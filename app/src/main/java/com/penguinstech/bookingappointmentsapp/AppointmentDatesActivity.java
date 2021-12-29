@@ -1,17 +1,33 @@
 package com.penguinstech.bookingappointmentsapp;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.DatePickerDialog;
+import android.content.Context;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.penguinstech.bookingappointmentsapp.adapters.BusinessDaysAdapter;
+import com.penguinstech.bookingappointmentsapp.model.Appointment;
+import com.penguinstech.bookingappointmentsapp.model.BusinessDay;
+import com.penguinstech.bookingappointmentsapp.model.BusinessHours;
+import com.penguinstech.bookingappointmentsapp.model.Client;
 import com.penguinstech.bookingappointmentsapp.model.Company;
 import com.penguinstech.bookingappointmentsapp.model.Service;
 
@@ -27,6 +43,7 @@ public class AppointmentDatesActivity extends AppCompatActivity {
     FirebaseFirestore db;//firestore instance
     String companyId;
     Company company;
+    Appointment appointment = new Appointment();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,6 +58,17 @@ public class AppointmentDatesActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
         companyId = getIntent().getStringExtra("companyId");
         selectedServices = (ArrayList<Service>) getIntent().getSerializableExtra("selectedServicesList");
+        List<String> serviceIds = new ArrayList<>();
+        float totalPrice = 0;
+        for (Service service:selectedServices) {
+            serviceIds.add(service.getFirebaseId());
+            totalPrice += Float.parseFloat(service.getPrice());
+        }
+        //add services and price to appointment
+        appointment.setServiceIds(TextUtils.join(",", serviceIds));
+        appointment.setTotalPrice(String.valueOf(totalPrice));
+        //since each task is 1 hr based, then duration is size of services
+        appointment.setDuration(String.valueOf(selectedServices.size()));
 
         findViewById(R.id.loader_1).setVisibility(View.VISIBLE);
         db.collection("companies").whereEqualTo("firebaseId", companyId)
@@ -60,6 +88,8 @@ public class AppointmentDatesActivity extends AppCompatActivity {
                             selectedCalendar.set(Calendar.MONTH,month);
                             selectedCalendar.set(Calendar.DAY_OF_MONTH,day);
                             updateLabel(selectedCalendar);
+                            getAvailableTimeSlots(selectedCalendar);
+
                         };
 
                         findViewById(R.id.selectDateBtn).setOnClickListener(V->{
@@ -79,12 +109,192 @@ public class AppointmentDatesActivity extends AppCompatActivity {
         });
     }
 
+    private void getAvailableTimeSlots(Calendar selectedCalendar) {
+
+
+        String dayOfWeek = new SimpleDateFormat("EEEE", Locale.ENGLISH).format(selectedCalendar.getTime());
+        //check if day has scheduled slots
+        for (int i = 0; i < company.getBusinessDayList().size();i++) {
+            BusinessDay businessDay  = company.getBusinessDayList().get(i);
+            if (businessDay.getDay().toLowerCase().equals(dayOfWeek.toLowerCase())) {
+                if (businessDay.isChecked()) {
+                    //get the business hours
+                    ArrayList<String> listOfAvailableSlots = new ArrayList<>();
+                    for (BusinessHours hour : businessDay.getListOfBusinessHours()) {
+                        //first add the start time
+                        //then add one hour to slot as long as its not above end time
+                        listOfAvailableSlots.add(hour.getStartTime());
+                        Calendar endTime = createTime(hour.getEndTime());
+                        Calendar nextSlot = createTime(hour.getStartTime());
+                        nextSlot.add(Calendar.HOUR_OF_DAY, 1);
+                        //add one hour until we exceed the end time
+
+                        while (nextSlot.compareTo(endTime) < 0) {
+                            listOfAvailableSlots.add(BusinessDaysAdapter.sdf.format(nextSlot.getTime()));
+                            nextSlot.add(Calendar.HOUR_OF_DAY, 1);
+                        }
+
+                    }
+
+                    getUnbookedAppointments(listOfAvailableSlots);
+
+
+                }else {
+                    Toast.makeText(AppointmentDatesActivity.this, "Sorry there are no available time slots for this day", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+
+
+
+
+
+    }
+
+    private void getUnbookedAppointments(List<String> listOfAvailableSlots) {
+
+        //get appointments that are already scheduled for this day
+        db.collection("company_appointments")
+                .document(company.getFirebaseId())
+                .collection("appointments").whereEqualTo("date", appointment.getDate())
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+
+                    List<Appointment> appointmentArrayList = queryDocumentSnapshots.toObjects(Appointment.class);
+                    //check if the timeslot is booked
+//                    List<String> availableSlots = listOfAvailableSlots;
+                    for (Appointment appointment: appointmentArrayList) {
+
+
+                        //change availability of the time slots
+                        Calendar endTimeOfAppointment = createTime(appointment.getStartTime());
+                        //add duration to time
+                        endTimeOfAppointment.add(Calendar.HOUR_OF_DAY, Integer.parseInt(appointment.getDuration()));
+
+                        for (int j = 0; j < listOfAvailableSlots.size();j++) {
+
+                            String hour = listOfAvailableSlots.get(j);
+                            Calendar endTime = createTime(hour);
+
+                            if(endTimeOfAppointment.compareTo(endTime) >= 0) {
+                                listOfAvailableSlots.remove(j);
+                            }
+                        }
+
+                    }
+
+                    displayAvailableHourSlots(listOfAvailableSlots);
+
+
+                });
+    }
+
+
+    private void displayAvailableHourSlots(List<String> listOfAvailableSlots) {
+
+        LinearLayout timeSlotsLL = findViewById(R.id.timeSlotsLL);
+        timeSlotsLL.removeAllViews();
+        //display dates
+        if (listOfAvailableSlots.size() > 0) {
+
+            for (String hour: listOfAvailableSlots) {
+                timeSlotsLL.addView(createButton(hour));
+            }
+
+        }else {
+            Toast.makeText(AppointmentDatesActivity.this, "Sorry All slots have been booked", Toast.LENGTH_SHORT).show();
+
+        }
+    }
+
 
     private void updateLabel(Calendar myCalendar){
         String myFormat="MM/dd/yy";
         SimpleDateFormat dateFormat=new SimpleDateFormat(myFormat, Locale.US);
         dateFormat.applyPattern("EEE, d MMM yyyy");
+        appointment.setDate(dateFormat.format(myCalendar.getTime()));
         TextView tv = findViewById(R.id.selectedDateTv);
         tv.setText(new StringBuilder().append("Selected Date is: ").append(dateFormat.format(myCalendar.getTime())));
+    }
+
+    private Button createButton(String txt) {
+        Button button = new Button(AppointmentDatesActivity.this);
+        button.setText(txt);
+        button.setOnClickListener(v->{
+            appointment.setStartTime(txt);
+            new ClientInformationForm(AppointmentDatesActivity.this, appointment, company).show(getSupportFragmentManager(), "AddClientInfoPopUp");
+        });
+        return button;
+    }
+
+    private static Calendar createTime(String time) {
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(time.split(":")[0]));
+        calendar.set(Calendar.MINUTE, Integer.parseInt(time.split(":")[1].split(" ")[0]));
+        calendar.set(Calendar.AM_PM,
+                time.split(":")[1].split(" ")[1].toLowerCase().equals("am")?Calendar.AM:Calendar.PM
+        );
+        return calendar;
+    }
+
+    public  static class ClientInformationForm extends BottomSheetDialogFragment {
+
+        private final Context context;
+        private final Appointment appointment;
+        private final FirebaseFirestore db;//firestore instance
+        private final Company company;
+        private final ClientInformationForm clientInformationForm = this;
+
+        public ClientInformationForm(Context context, Appointment appointment, Company company) {
+            this.appointment = appointment;
+            this.context = context;
+            this.company = company;
+            FirebaseApp.initializeApp(context);
+            db = FirebaseFirestore.getInstance();
+        }
+
+        @Nullable
+        @Override
+        public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+            View view = inflater.inflate(R.layout.client_contact_layout_form, container, false);
+            EditText fullNameEt = view.findViewById(R.id.fullNameEt);
+            EditText emailEt = view.findViewById(R.id.emailEt);
+            EditText phoneNoEt = view.findViewById(R.id.phoneNoEt);
+            view.findViewById(R.id.bookAppointmentBtn).setOnClickListener(v->{
+
+                if(!fullNameEt.getText().toString().trim().equals("") && !emailEt.getText().toString().trim().equals("")
+                    && !phoneNoEt.getText().toString().trim().equals("")
+                ) {
+
+                    appointment.setClient(
+                            new Client(fullNameEt.getText().toString(),
+                                    phoneNoEt.getText().toString(),
+                                    emailEt.getText().toString()
+                            )
+                    );
+
+                    //set appointment to server
+                    DocumentReference ref = db.collection("company_appointments")
+                            .document(company.getFirebaseId())
+                            .collection("appointments")
+                            .document();
+                    appointment.setFirebaseId(ref.getId());
+                    ref.set(appointment)
+                            .addOnSuccessListener(documentReference -> {
+                                clientInformationForm.dismiss();
+                                Toast.makeText(context, "Successfully added appointment", Toast.LENGTH_SHORT).show();
+
+                            }).addOnFailureListener(e-> {
+                        Toast.makeText(context, "Could not add appointment", Toast.LENGTH_SHORT).show();
+                    });
+
+
+                }else {
+                    Toast.makeText(getContext(), "All fields are required", Toast.LENGTH_SHORT).show();
+                }
+            });
+            return view;
+        }
     }
 }

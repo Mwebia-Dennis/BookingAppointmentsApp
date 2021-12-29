@@ -53,6 +53,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:layout_below="@+id/selectedDateTv"
+            android:id="@+id/timeSlotsLL"
             android:layout_alignParentStart="true"
             >
             <ProgressBar

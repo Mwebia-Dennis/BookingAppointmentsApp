@@ -104,7 +104,7 @@ public class HoursAdapter  extends RecyclerView.Adapter<HoursAdapter.ViewHolder>
     private void changeStartTime( int position, View v) {
         String currentTime = businessHourList.get(position).getStartTime();
         Calendar mcurrentTime = Calendar.getInstance();
-        mcurrentTime.set(Calendar.HOUR, Integer.parseInt(currentTime.split(":")[0]));
+        mcurrentTime.set(Calendar.HOUR_OF_DAY, Integer.parseInt(currentTime.split(":")[0]));
         mcurrentTime.set(Calendar.MINUTE, Integer.parseInt(currentTime.split(":")[1].split(" ")[0]));
         mcurrentTime.set(Calendar.AM_PM,
                 currentTime.split(":")[1].split(" ")[1].toLowerCase().equals("am")?Calendar.AM:Calendar.PM
@@ -126,7 +126,7 @@ public class HoursAdapter  extends RecyclerView.Adapter<HoursAdapter.ViewHolder>
                 //get the start time of the previously scheduled hour before the current one
                 String endTime = businessHourList.get(position-1).getEndTime();
                 previousTime = Calendar.getInstance();
-                previousTime.set(Calendar.HOUR, Integer.parseInt(endTime.split(":")[0]));
+                previousTime.set(Calendar.HOUR_OF_DAY, Integer.parseInt(endTime.split(":")[0]));
                 previousTime.set(Calendar.MINUTE, Integer.parseInt(endTime.split(":")[1].split(" ")[0]));
                 previousTime.set(Calendar.AM_PM,
                         endTime.split(":")[1].split(" ")[1].toLowerCase().equals("am")?Calendar.AM:Calendar.PM
@@ -138,7 +138,7 @@ public class HoursAdapter  extends RecyclerView.Adapter<HoursAdapter.ViewHolder>
                 //get the start time of the next scheduled hour after the current one
                 String startTime = businessHourList.get(position+1).getStartTime();
                 nextStartTime = Calendar.getInstance();
-                nextStartTime.set(Calendar.HOUR, Integer.parseInt(startTime.split(":")[0]));
+                nextStartTime.set(Calendar.HOUR_OF_DAY, Integer.parseInt(startTime.split(":")[0]));
                 nextStartTime.set(Calendar.MINUTE, Integer.parseInt(startTime.split(":")[1].split(" ")[0]));
                 nextStartTime.set(Calendar.AM_PM,
                         startTime.split(":")[1].split(" ")[1].toLowerCase().equals("am")?Calendar.AM:Calendar.PM
@@ -179,7 +179,7 @@ public class HoursAdapter  extends RecyclerView.Adapter<HoursAdapter.ViewHolder>
     private void changeEndTime( int position, View v) {
         String currentTime = businessHourList.get(position).getEndTime();
         Calendar mcurrentTime = Calendar.getInstance();
-        mcurrentTime.set(Calendar.HOUR, Integer.parseInt(currentTime.split(":")[0]));
+        mcurrentTime.set(Calendar.HOUR_OF_DAY, Integer.parseInt(currentTime.split(":")[0]));
         mcurrentTime.set(Calendar.MINUTE, Integer.parseInt(currentTime.split(":")[1].split(" ")[0]));
         mcurrentTime.set(Calendar.AM_PM,
                 currentTime.split(":")[1].split(" ")[1].toLowerCase().equals("am")?Calendar.AM:Calendar.PM
@@ -197,7 +197,7 @@ public class HoursAdapter  extends RecyclerView.Adapter<HoursAdapter.ViewHolder>
             //get the start time of current holder
             String currentStartTime = businessHourList.get(position).getStartTime();
             Calendar previousTime = Calendar.getInstance();
-            previousTime.set(Calendar.HOUR, Integer.parseInt(currentStartTime.split(":")[0]));
+            previousTime.set(Calendar.HOUR_OF_DAY, Integer.parseInt(currentStartTime.split(":")[0]));
             previousTime.set(Calendar.MINUTE, Integer.parseInt(currentStartTime.split(":")[1].split(" ")[0]));
             previousTime.set(Calendar.AM_PM,
                     currentStartTime.split(":")[1].split(" ")[1].toLowerCase().equals("am")?Calendar.AM:Calendar.PM
@@ -210,7 +210,7 @@ public class HoursAdapter  extends RecyclerView.Adapter<HoursAdapter.ViewHolder>
                 //get the start time of the next scheduled hour after the current one
                 String startTime = businessHourList.get(position+1).getStartTime();
                 nextStartTime = Calendar.getInstance();
-                nextStartTime.set(Calendar.HOUR, Integer.parseInt(startTime.split(":")[0]));
+                nextStartTime.set(Calendar.HOUR_OF_DAY, Integer.parseInt(startTime.split(":")[0]));
                 nextStartTime.set(Calendar.MINUTE, Integer.parseInt(startTime.split(":")[1].split(" ")[0]));
                 nextStartTime.set(Calendar.AM_PM,
                         startTime.split(":")[1].split(" ")[1].toLowerCase().equals("am")?Calendar.AM:Calendar.PM

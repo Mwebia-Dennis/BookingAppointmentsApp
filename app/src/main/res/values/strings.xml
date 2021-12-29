@@ -40,4 +40,7 @@
     <string name="select_date">Select Date</string>
     <string name="select_date_and_time">Select Date And Time</string>
     <string name="selected_date_mon_21_2021">Selected Date: Mon 21, 2021</string>
+    <string name="enter_your_contact_details">Enter Your Contact Details</string>
+    <string name="full_name">Full Name</string>
+    <string name="submit">Submit</string>
 </resources>
