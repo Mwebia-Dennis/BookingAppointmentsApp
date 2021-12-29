@@ -1,9 +1,11 @@
 package com.penguinstech.bookingappointmentsapp.model;
 
-public class Appointment {
+import java.io.Serializable;
+
+public class Appointment implements Serializable {
 
     Client client;
-    String firebaseId, date, duration, startTime, totalPrice;
+    String firebaseId, date, duration, startTime, totalPrice, companyId;
     String appointmentStatus = AppointmentStatus.PENDING;
     String notificationStatus = NotificationStatus.UNREAD;
     String serviceIds;//a list of service id that are joined to form a string separated by a comma
@@ -17,6 +19,14 @@ public class Appointment {
         this.startTime = startTime;
         this.serviceIds = serviceIds;
         this.totalPrice = totalPrice;
+    }
+
+    public String getCompanyId() {
+        return companyId;
+    }
+
+    public void setCompanyId(String companyId) {
+        this.companyId = companyId;
     }
 
     public String getFirebaseId() {

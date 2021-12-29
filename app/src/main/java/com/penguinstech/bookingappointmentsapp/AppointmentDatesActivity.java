@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.DatePickerDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -31,6 +32,7 @@ import com.penguinstech.bookingappointmentsapp.model.Client;
 import com.penguinstech.bookingappointmentsapp.model.Company;
 import com.penguinstech.bookingappointmentsapp.model.Service;
 
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -39,7 +41,7 @@ import java.util.Locale;
 
 public class AppointmentDatesActivity extends AppCompatActivity {
 
-    List<Service> selectedServices;
+    static List<Service> selectedServices;
     FirebaseFirestore db;//firestore instance
     String companyId;
     Company company;
@@ -61,7 +63,7 @@ public class AppointmentDatesActivity extends AppCompatActivity {
         List<String> serviceIds = new ArrayList<>();
         float totalPrice = 0;
         for (Service service:selectedServices) {
-            serviceIds.add(service.getFirebaseId());
+            serviceIds.add(service.getServiceName());
             totalPrice += Float.parseFloat(service.getPrice());
         }
         //add services and price to appointment
@@ -280,10 +282,16 @@ public class AppointmentDatesActivity extends AppCompatActivity {
                             .collection("appointments")
                             .document();
                     appointment.setFirebaseId(ref.getId());
+                    appointment.setCompanyId(company.getFirebaseId());
                     ref.set(appointment)
                             .addOnSuccessListener(documentReference -> {
                                 clientInformationForm.dismiss();
                                 Toast.makeText(context, "Successfully added appointment", Toast.LENGTH_SHORT).show();
+                                Intent intent = new Intent(context, BookingConfirmationActivity.class);
+//                                intent.putExtra("selectedServicesList", (Serializable) selectedServices);
+                                intent.putExtra("appointment", appointment);
+                                intent.putExtra("companyId", company.getFirebaseId());
+                                startActivity(intent);
 
                             }).addOnFailureListener(e-> {
                         Toast.makeText(context, "Could not add appointment", Toast.LENGTH_SHORT).show();

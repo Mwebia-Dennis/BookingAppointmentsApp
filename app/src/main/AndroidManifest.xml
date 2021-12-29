@@ -13,7 +13,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.BookingAppointmentsApp">
-        <activity android:name=".BookingConfirmationActivity"></activity>
+        <activity android:name=".NotificationsActivity"></activity>
+        <activity android:name=".BookingConfirmationActivity" />
         <activity android:name=".AppointmentDatesActivity" />
         <activity android:name=".SelectServicesActivity" />
         <activity android:name=".CompanyDetails" />

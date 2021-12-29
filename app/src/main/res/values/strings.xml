@@ -43,4 +43,12 @@
     <string name="enter_your_contact_details">Enter Your Contact Details</string>
     <string name="full_name">Full Name</string>
     <string name="submit">Submit</string>
+    <string name="booking_success_msg">Appointment has been placed successfully, waiting for confirmation from company</string>
+    <string name="cancel_appointment">Cancel Appointment</string>
+    <string name="requested_services">Requested Services:</string>
+    <string name="return_to_home">Return To home</string>
+    <string name="accept">Accept</string>
+    <string name="decline">Decline</string>
+    <string name="notification">notification</string>
+    <string name="_0">0</string>
 </resources>

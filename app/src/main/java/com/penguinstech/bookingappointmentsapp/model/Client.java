@@ -1,6 +1,8 @@
 package com.penguinstech.bookingappointmentsapp.model;
 
-public class Client {
+import java.io.Serializable;
+
+public class Client implements Serializable {
 
     private String fullName, phoneNumber, email;
     public Client() {}
