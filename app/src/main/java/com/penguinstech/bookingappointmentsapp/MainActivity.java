@@ -5,8 +5,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.ActivityManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -14,10 +17,13 @@ import android.view.MenuItem;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.penguinstech.bookingappointmentsapp.adapters.CompanyAdapter;
+import com.penguinstech.bookingappointmentsapp.background_services.AppointmentListenerService;
 import com.penguinstech.bookingappointmentsapp.model.Company;
 import com.penguinstech.bookingappointmentsapp.model.Util;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -56,6 +62,35 @@ public class MainActivity extends AppCompatActivity {
         companyList = new ArrayList<>();
         updateUi();
 
+
+    }
+
+    private boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                Log.i ("Service status", "Running");
+                return true;
+            }
+        }
+        Log.i ("Service status", "Not running");
+        return false;
+    }
+
+    private void startBackgroundService() {
+        ArrayList<String> companyIds = new ArrayList<>();
+        for (int i = 0; i < companyList.size(); i++){
+
+            Company company = companyList.get(i);
+            if (company.getOwnerName().equals(Util.owner))
+                companyIds.add(company.getFirebaseId());
+        }
+        AppointmentListenerService service = new AppointmentListenerService();
+        if (!isMyServiceRunning(service.getClass())) {
+            Intent serviceIntent = new Intent(this, service.getClass());
+            serviceIntent.putStringArrayListExtra("companyIds", companyIds);
+            startService(serviceIntent);
+        }
     }
 
     @Override
@@ -76,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
 
                         //convert whole queryDocumentSnapshots to list
                         companyList = queryDocumentSnapshots.toObjects(Company.class);
-
+                        startBackgroundService();
                         RecyclerView recyclerView = findViewById(R.id.mainRv);
                         recyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this, LinearLayoutManager.VERTICAL, false));
                         CompanyAdapter adapter = new CompanyAdapter(MainActivity.this, companyList);
@@ -87,5 +122,10 @@ public class MainActivity extends AppCompatActivity {
                 }).addOnFailureListener(e->{
             Log.i("error", e.getMessage());
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 }

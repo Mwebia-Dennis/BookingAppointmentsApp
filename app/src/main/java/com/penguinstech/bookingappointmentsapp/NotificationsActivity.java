@@ -22,6 +22,7 @@ public class NotificationsActivity extends AppCompatActivity {
 
     List<Appointment> appointmentList;
     FirebaseFirestore db;//firestore instance
+
     String companyId;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
