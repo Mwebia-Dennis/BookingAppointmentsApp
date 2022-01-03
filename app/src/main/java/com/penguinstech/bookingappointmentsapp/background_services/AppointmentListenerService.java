@@ -52,6 +52,8 @@ public class AppointmentListenerService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        Log.i("service:create", "true");
 //        android.os.Debug.waitForDebugger();
     }
 
@@ -79,6 +81,7 @@ public class AppointmentListenerService extends Service {
                             return;
                         }
 
+                        int notifId = 1;
                         for (DocumentChange dc : snapshots.getDocumentChanges()) {
                             if (dc.getType() == DocumentChange.Type.ADDED) {
                                 //new data has been added
@@ -88,10 +91,11 @@ public class AppointmentListenerService extends Service {
                                 StringBuilder message = new StringBuilder().append(appointment.getClient().getFullName())
                                         .append(" requested an appointment with your company");
                                 if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O)
-                                    startMyOwnForeground(String.valueOf(message));
+                                    startMyOwnForeground(String.valueOf(message), notifId);
                                 else
-                                    showNotification(String.valueOf(message));
+                                    showNotification(String.valueOf(message), notifId);
                             }
+                            notifId++;
                         }
 
 
@@ -101,7 +105,7 @@ public class AppointmentListenerService extends Service {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private void startMyOwnForeground(String message)
+    private void startMyOwnForeground(String message, int notifId)
     {
         String channelName = "Appointment Background Service";
         NotificationChannel chan = new NotificationChannel(NOTIFICATION_CHANNEL_ID, channelName, NotificationManager.IMPORTANCE_HIGH);
@@ -111,12 +115,12 @@ public class AppointmentListenerService extends Service {
         NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         assert manager != null;
         manager.createNotificationChannel(chan);
-        showNotification(message);
+        showNotification(message, notifId);
 
 
     }
 
-    private void showNotification(String message) {
+    private void showNotification(String message, int notifId) {
         PendingIntent pendingIntent =
                 PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), 0);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID);
@@ -125,12 +129,25 @@ public class AppointmentListenerService extends Service {
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setContentText(message)
                 .setContentIntent(pendingIntent)
+                .setAutoCancel(true)
+                .setOngoing(false)
                 .setCategory(Notification.CATEGORY_SERVICE);
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
             notificationBuilder.setPriority(NotificationManager.IMPORTANCE_MIN);
         }
         Notification notification = notificationBuilder.build();
-        startForeground(2, notification);
+        startForeground(notifId, notification);
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        Log.i("service:destroy", "true");
+        Intent broadcastIntent = new Intent();
+        broadcastIntent.putStringArrayListExtra("companyIds", companyIds);
+        broadcastIntent.setAction("restart_service");
+        broadcastIntent.setClass(this, RestartServiceReceiver.class);
+        this.sendBroadcast(broadcastIntent);
+    }
 }

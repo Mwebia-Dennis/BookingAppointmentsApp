@@ -221,6 +221,8 @@ public class HoursAdapter  extends RecyclerView.Adapter<HoursAdapter.ViewHolder>
             if(newEndTime.compareTo(previousTime) < 0) {
                 //if selected time is below the previous meeting start time, warn user
                 //newStartTime is less than previousTime
+
+                Log.i("sdfsfs", BusinessDaysAdapter.sdf.format(newEndTime.getTime()));
                 Snackbar.make(v, "You have already scheduled for this hour "+BusinessDaysAdapter.sdf.format(newEndTime.getTime()),
                         Snackbar.LENGTH_LONG).show();
                 return;

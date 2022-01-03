@@ -26,7 +26,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service android:name="com.penguinstech.bookingappointmentsapp.background_services.AppointmentListenerService"
+
+        <receiver android:name=".background_services.RestartServiceReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="restart_service" />
+            </intent-filter>
+        </receiver>
+        <service
+            android:name=".background_services.AppointmentListenerService"
             android:enabled="true"
             />
     </application>

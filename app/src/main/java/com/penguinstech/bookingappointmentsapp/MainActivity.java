@@ -18,6 +18,7 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.penguinstech.bookingappointmentsapp.adapters.CompanyAdapter;
 import com.penguinstech.bookingappointmentsapp.background_services.AppointmentListenerService;
+import com.penguinstech.bookingappointmentsapp.background_services.RestartServiceReceiver;
 import com.penguinstech.bookingappointmentsapp.model.Company;
 import com.penguinstech.bookingappointmentsapp.model.Util;
 
@@ -32,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
 
     List<Company> companyList;
     FirebaseFirestore db;//firestore instance
+    Intent serviceIntent = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -87,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
         }
         AppointmentListenerService service = new AppointmentListenerService();
         if (!isMyServiceRunning(service.getClass())) {
-            Intent serviceIntent = new Intent(this, service.getClass());
+            serviceIntent = new Intent(this, service.getClass());
             serviceIntent.putStringArrayListExtra("companyIds", companyIds);
             startService(serviceIntent);
         }
@@ -126,6 +128,17 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+
+        if(serviceIntent != null) {
+
+            Log.i("closed", "intent");
+            stopService(serviceIntent);
+            Intent broadcastIntent = new Intent();
+            broadcastIntent.putStringArrayListExtra("companyIds", serviceIntent.getStringArrayListExtra("companyIds"));
+            broadcastIntent.setAction("restart_service");
+            broadcastIntent.setClass(this, RestartServiceReceiver.class);
+            this.sendBroadcast(broadcastIntent);
+        }
         super.onDestroy();
     }
 }
