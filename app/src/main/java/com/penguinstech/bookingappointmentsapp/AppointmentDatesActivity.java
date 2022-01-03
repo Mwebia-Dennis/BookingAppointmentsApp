@@ -9,12 +9,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -32,7 +30,6 @@ import com.penguinstech.bookingappointmentsapp.model.Client;
 import com.penguinstech.bookingappointmentsapp.model.Company;
 import com.penguinstech.bookingappointmentsapp.model.Service;
 
-import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -69,8 +66,7 @@ public class AppointmentDatesActivity extends AppCompatActivity {
         //add services and price to appointment
         appointment.setServiceIds(TextUtils.join(",", serviceIds));
         appointment.setTotalPrice(String.valueOf(totalPrice));
-        //since each task is 1 hr based, then duration is size of services
-        appointment.setDuration(String.valueOf(selectedServices.size()));
+        appointment.setDuration(getDuration(selectedServices));
 
         findViewById(R.id.loader_1).setVisibility(View.VISIBLE);
         db.collection("companies").whereEqualTo("firebaseId", companyId)
@@ -171,7 +167,10 @@ public class AppointmentDatesActivity extends AppCompatActivity {
                         //change availability of the time slots
                         Calendar endTimeOfAppointment = createTime(appointment.getStartTime());
                         //add duration to time
-                        endTimeOfAppointment.add(Calendar.HOUR_OF_DAY, Integer.parseInt(appointment.getDuration()));
+                        int durationHours = Integer.parseInt(appointment.getDuration().split(":")[0]);
+                        int durationMins = Integer.parseInt(appointment.getDuration().split(":")[1]);
+                        endTimeOfAppointment.add(Calendar.HOUR_OF_DAY, durationHours);
+                        endTimeOfAppointment.add(Calendar.MINUTE, durationMins);
 
                         for (int j = 0; j < listOfAvailableSlots.size();j++) {
 
@@ -238,6 +237,26 @@ public class AppointmentDatesActivity extends AppCompatActivity {
                 time.split(":")[1].split(" ")[1].toLowerCase().equals("am")?Calendar.AM:Calendar.PM
         );
         return calendar;
+    }
+
+    private String getDuration(List<Service> selectedServices) {
+        int hours = 0;
+        int minutes = 0;
+        for (Service service: selectedServices) {
+            if (Integer.parseInt(service.getMins()) > 0) {
+                minutes += Integer.parseInt(service.getMins());
+                if (minutes > 60) {
+                    hours++;
+                    minutes = 0;
+                }
+            }
+
+            if (Integer.parseInt(service.getHours()) > 0) {
+                hours += Integer.parseInt(service.getHours());
+            }
+        }
+
+        return hours + ":" + minutes;
     }
 
     public  static class ClientInformationForm extends BottomSheetDialogFragment {
