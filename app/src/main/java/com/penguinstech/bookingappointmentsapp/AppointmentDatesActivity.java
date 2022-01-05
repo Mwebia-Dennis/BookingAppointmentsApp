@@ -245,9 +245,9 @@ public class AppointmentDatesActivity extends AppCompatActivity {
         for (Service service: selectedServices) {
             if (Integer.parseInt(service.getMins()) > 0) {
                 minutes += Integer.parseInt(service.getMins());
-                if (minutes > 60) {
+                if (minutes >= 60) {
                     hours++;
-                    minutes = 0;
+                    minutes %= 60;
                 }
             }
 
