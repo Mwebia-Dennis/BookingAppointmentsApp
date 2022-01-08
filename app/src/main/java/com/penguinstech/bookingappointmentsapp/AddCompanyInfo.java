@@ -46,7 +46,17 @@ public class AddCompanyInfo extends AppCompatActivity {
     FirebaseFirestore db;//firestore instance
     StorageReference storageRef;
     Boolean isLogoImage = true;
+    Boolean isEditing = false;
     Uri logoUri, businessPhotoUri = null;
+    Company company = new Company();
+    EditText name;
+    EditText des;
+    EditText address;
+    EditText phone;
+    EditText email;
+    EditText website;
+    EditText instagram;
+    EditText facebook;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,15 +70,31 @@ public class AddCompanyInfo extends AppCompatActivity {
 
     private void init() {
 
+        name = findViewById(R.id.business_name);
+        des = findViewById(R.id.business_des);
+        address = findViewById(R.id.address);
+        phone = findViewById(R.id.phone_number);
+        email = findViewById(R.id.email);
+        website = findViewById(R.id.website);
+        instagram = findViewById(R.id.instagram);
+        facebook = findViewById(R.id.facebook);
         FirebaseApp.initializeApp(this);
         db = FirebaseFirestore.getInstance();
         storageRef = FirebaseStorage.getInstance().getReference("files/"+ Util.owner);
+        //check if there is company data in the intent
+        //if there is data then we are editing
+        if(getIntent().getSerializableExtra("companyDetails") != null) {
+            isEditing = true;
+            company = (Company) getIntent().getSerializableExtra("companyDetails");
+            updateUi();
+        }
         listOfBusinessDays = new ArrayList<>();
         RecyclerView recyclerView = findViewById(R.id.business_days);
         recyclerView.setLayoutManager(new LinearLayoutManager(AddCompanyInfo.this, LinearLayoutManager.VERTICAL, false));
         businessDaysAdapter = new BusinessDaysAdapter(this, listOfBusinessDays);
         recyclerView.setAdapter(businessDaysAdapter);
         loadBusinessDays();
+
 
 
         findViewById(R.id.add_logo_img).setOnClickListener(v-> {
@@ -111,20 +137,53 @@ public class AddCompanyInfo extends AppCompatActivity {
                 });
     }
 
-    private void loadBusinessDays() {
-        final String[] daysOfWeek = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
-        for (String day : daysOfWeek) {
+    private void updateUi() {
+        name.setText(company.getCompanyName());
 
-            listOfBusinessDays.add(new BusinessDay(day, getHours(), false));
+        if(company.getDescription() != null) {
+            des.setText(company.getDescription());
+        }
+        if(company.getAddress() != null) {
+            address.setText(company.getAddress());
+        }
+        if(company.getPhone() != null) {
+            phone.setText(company.getPhone());
+        }
+        if(company.getEmail() != null) {
+            email.setText(company.getEmail());
+        }
+
+        if(company.getInstagram() != null) {
+            instagram.setText(company.getInstagram());
+        }
+        if(company.getFacebook() != null) {
+            facebook.setText(company.getFacebook());
+        }
+
+    }
+
+    private void loadBusinessDays() {
+        //if we are editing get details from company object
+        if (isEditing){
+            listOfBusinessDays.addAll(company.getBusinessDayList());
+        }else {
+            //else add dummy samples on UI
+            final String[] daysOfWeek = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
+            for (String day : daysOfWeek) {
+
+                listOfBusinessDays.add(new BusinessDay(day, getHours(), false));
+            }
         }
         businessDaysAdapter.notifyDataSetChanged();
     }
 
 
     private ArrayList<BusinessHours> getHours() {
+
         ArrayList<BusinessHours> list = new ArrayList<>();
         list.clear();
 
+        //business hours between 08 am and 09 am
         Calendar startTime = Calendar.getInstance();
         startTime.set(Calendar.HOUR_OF_DAY, 8);
         startTime.set(Calendar.MINUTE, 0);
@@ -173,21 +232,12 @@ public class AddCompanyInfo extends AppCompatActivity {
     }
 
     private void saveCompanyDetails() {
-        EditText name = findViewById(R.id.business_name);
-        EditText des = findViewById(R.id.business_des);
-        EditText address = findViewById(R.id.address);
-        EditText phone = findViewById(R.id.phone_number);
-        EditText email = findViewById(R.id.email);
-        EditText website = findViewById(R.id.website);
-        EditText instagram = findViewById(R.id.instagram);
-        EditText facebook = findViewById(R.id.facebook);
         if(name.getText().toString().trim().equals("")) {
             //validate form, business name
             name.setError("this field is required");
             name.requestFocus();
         }else {
 
-            Company company = new Company();
             company.setCompanyName(name.getText().toString().trim());
 
             if(!des.getText().toString().trim().equals("")) {
@@ -215,8 +265,14 @@ public class AddCompanyInfo extends AppCompatActivity {
             company.setBusinessDayList(listOfBusinessDays);
 
             Toast.makeText(this, "loading please wait...", Toast.LENGTH_SHORT).show();
-            DocumentReference ref = db.collection("companies").document();
-            company.setFirebaseId(ref.getId());
+            DocumentReference ref;
+            if(!isEditing){
+
+                ref = db.collection("companies").document();
+                company.setFirebaseId(ref.getId());
+            }else {
+                ref = db.collection("companies").document(company.getFirebaseId());
+            }
 
             ref.set(company)
                     .addOnSuccessListener(documentReference -> {
@@ -231,7 +287,7 @@ public class AddCompanyInfo extends AppCompatActivity {
 
                                         task.getResult().getStorage().getDownloadUrl().addOnSuccessListener(uri -> {
                                             db.collection("companies")
-                                                    .document(ref.getId()).update("logo", uri.toString()).addOnSuccessListener(aVoid->{
+                                                    .document(company.getFirebaseId()).update("logo", uri.toString()).addOnSuccessListener(aVoid->{
 
                                                         Log.i("logo upload: ", "Successful");
                                             }).addOnFailureListener(e-> {
@@ -259,7 +315,7 @@ public class AddCompanyInfo extends AppCompatActivity {
 
                                         task.getResult().getStorage().getDownloadUrl().addOnSuccessListener(uri -> {
                                             db.collection("companies")
-                                                    .document(ref.getId()).update("photo", uri.toString()).addOnSuccessListener(aVoid->{
+                                                    .document(company.getFirebaseId()).update("photo", uri.toString()).addOnSuccessListener(aVoid->{
 
                                                 Log.i("photo upload: ", "Successful");
                                             }).addOnFailureListener(e-> {

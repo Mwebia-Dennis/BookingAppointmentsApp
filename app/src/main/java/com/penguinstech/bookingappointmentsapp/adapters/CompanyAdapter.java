@@ -11,12 +11,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.AppCompatButton;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.penguinstech.bookingappointmentsapp.AddCompanyInfo;
 import com.penguinstech.bookingappointmentsapp.CompanyDetails;
 import com.penguinstech.bookingappointmentsapp.NotificationsActivity;
 import com.penguinstech.bookingappointmentsapp.R;
@@ -65,6 +67,13 @@ public class CompanyAdapter extends RecyclerView.Adapter<CompanyAdapter.ViewHold
             holder.itemView.getContext().startActivity(intent);
         });
 
+        holder.editCompanyBtn.setOnClickListener(_v->{
+
+            Intent intent = new Intent(holder.itemView.getContext(), AddCompanyInfo.class);
+            intent.putExtra("companyDetails", company);
+            holder.itemView.getContext().startActivity(intent);
+        });
+
         loadNewNotifications(company.getFirebaseId(),holder.notificationBadgeTv);
     }
 
@@ -100,6 +109,7 @@ public class CompanyAdapter extends RecyclerView.Adapter<CompanyAdapter.ViewHold
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView companyNameTv, ownerNameTv, notificationBadgeTv;
         ImageView businessLogo, notificationBadge;
+        AppCompatButton editCompanyBtn;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             companyNameTv = itemView.findViewById(R.id.company_name_tv);
@@ -107,6 +117,7 @@ public class CompanyAdapter extends RecyclerView.Adapter<CompanyAdapter.ViewHold
             businessLogo = itemView.findViewById(R.id.business_logo);
             notificationBadge = itemView.findViewById(R.id.notificationBadge);
             notificationBadgeTv = itemView.findViewById(R.id.notificationBadgeTv);
+            editCompanyBtn = itemView.findViewById(R.id.editCompanyBtn);
 
         }
     }
