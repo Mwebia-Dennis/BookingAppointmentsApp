@@ -43,6 +43,7 @@ public class AppointmentDatesActivity extends AppCompatActivity {
     String companyId;
     Company company;
     Appointment appointment = new Appointment();
+    LinearLayout timeSlotsLL;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,6 +54,7 @@ public class AppointmentDatesActivity extends AppCompatActivity {
 
     private void init() {
 
+        timeSlotsLL = findViewById(R.id.timeSlotsLL);
         FirebaseApp.initializeApp(this);
         db = FirebaseFirestore.getInstance();
         companyId = getIntent().getStringExtra("companyId");
@@ -105,6 +107,51 @@ public class AppointmentDatesActivity extends AppCompatActivity {
             Toast.makeText(this, "Sorry could not load company info", Toast.LENGTH_SHORT).show();
             finish();
         });
+
+        findViewById(R.id.bookAppointment1).setOnClickListener(v->{
+            if (appointment.getStartTime() == null) {
+                Toast.makeText(AppointmentDatesActivity.this, "Invalid start time", Toast.LENGTH_SHORT).show();
+            }else if (appointment.getStartTime().equals("")) {
+                Toast.makeText(AppointmentDatesActivity.this, "Invalid start time", Toast.LENGTH_SHORT).show();
+            }else {
+
+                /**
+                 * if your app has login feature, remove this code
+                 * uncomment the code below
+                 * remove ClientInformationForm (popup) class
+                 */
+                new ClientInformationForm(AppointmentDatesActivity.this, appointment, company)
+                    .show(getSupportFragmentManager(), "AddClientInfoPopUp");
+
+//                appointment.setClient(
+//                        new Client("client full name",
+//                                "phone number",
+//                                "email"
+//                        )
+//                );
+//
+//                //set appointment to server
+//                DocumentReference ref = db.collection("company_appointments")
+//                        .document(company.getFirebaseId())
+//                        .collection("appointments")
+//                        .document();
+//                appointment.setFirebaseId(ref.getId());
+//                appointment.setCompanyId(company.getFirebaseId());
+//                ref.set(appointment)
+//                        .addOnSuccessListener(documentReference -> {
+//                            Toast.makeText(AppointmentDatesActivity.this, "Successfully added appointment", Toast.LENGTH_SHORT).show();
+//                            Intent intent = new Intent(AppointmentDatesActivity.this, BookingConfirmationActivity.class);
+////                                intent.putExtra("selectedServicesList", (Serializable) selectedServices);
+//                            intent.putExtra("appointment", appointment);
+//                            intent.putExtra("companyId", company.getFirebaseId());
+//                            startActivity(intent);
+//
+//                        }).addOnFailureListener(e-> {
+//                    Toast.makeText(AppointmentDatesActivity.this, "Could not add appointment", Toast.LENGTH_SHORT).show();
+//                });
+            }
+        });
+
     }
 
     private void getAvailableTimeSlots(Calendar selectedCalendar) {
@@ -193,7 +240,6 @@ public class AppointmentDatesActivity extends AppCompatActivity {
 
     private void displayAvailableHourSlots(List<String> listOfAvailableSlots) {
 
-        LinearLayout timeSlotsLL = findViewById(R.id.timeSlotsLL);
         timeSlotsLL.removeAllViews();
         //display dates
         if (listOfAvailableSlots.size() > 0) {
@@ -223,7 +269,18 @@ public class AppointmentDatesActivity extends AppCompatActivity {
         button.setText(txt);
         button.setOnClickListener(v->{
             appointment.setStartTime(txt);
-            new ClientInformationForm(AppointmentDatesActivity.this, appointment, company).show(getSupportFragmentManager(), "AddClientInfoPopUp");
+            //change active background color
+            //set all buttons to grey
+            //add active color to clicked button
+            for (int i = 0; i < timeSlotsLL.getChildCount(); i++) {
+                View btnView = timeSlotsLL.getChildAt(i);
+                if (btnView instanceof Button){
+                    Button btn = (Button) btnView;
+                    btn.setBackgroundResource(android.R.drawable.btn_default);;
+                }
+            }
+
+            v.setBackgroundResource(R.color.purple_200);
         });
         return button;
     }
