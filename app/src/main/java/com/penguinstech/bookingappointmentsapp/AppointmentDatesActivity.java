@@ -226,7 +226,7 @@ public class AppointmentDatesActivity extends AppCompatActivity {
 
                         for (Iterator<String> iterator = listOfAvailableSlots.iterator(); iterator.hasNext();) {
                             String hour = iterator.next();
-                            if (hour.isEmpty()) {
+                            if (!hour.isEmpty()) {
                                 // Remove the current element from the iterator and the list.
                                 Calendar endTime = createTime(hour);
                                 if(endTimeOfAppointment.compareTo(endTime) >= 0) {
