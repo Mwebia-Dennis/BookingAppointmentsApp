@@ -355,7 +355,8 @@ public class AddCompanyInfo extends AppCompatActivity {
     public final int READ_STORAGE_REQUEST_CODE = 2549;//this is a random number
     private void requestReadStoragePermission(){
 
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) !=
+                PackageManager.PERMISSION_GRANTED){
 
             requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},READ_STORAGE_REQUEST_CODE);
         }

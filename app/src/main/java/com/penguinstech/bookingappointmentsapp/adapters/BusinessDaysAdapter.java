@@ -19,7 +19,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BusinessDaysAdapter extends RecyclerView.Adapter<BusinessDaysAdapter.ViewHolder> {
+public class    BusinessDaysAdapter extends RecyclerView.Adapter<BusinessDaysAdapter.ViewHolder> {
 
     private final List<BusinessDay> businessDayList;
     private final Context context;

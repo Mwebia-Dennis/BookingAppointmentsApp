@@ -33,8 +33,11 @@ import com.penguinstech.bookingappointmentsapp.model.Service;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 public class AppointmentDatesActivity extends AppCompatActivity {
 
@@ -208,26 +211,39 @@ public class AppointmentDatesActivity extends AppCompatActivity {
                     List<Appointment> appointmentArrayList = queryDocumentSnapshots.toObjects(Appointment.class);
                     //check if the timeslot is booked
 //                    List<String> availableSlots = listOfAvailableSlots;
+
                     for (Appointment appointment: appointmentArrayList) {
 
 
                         //change availability of the time slots
                         Calendar endTimeOfAppointment = createTime(appointment.getStartTime());
                         //add duration to time
-                        int durationHours = Integer.parseInt(appointment.getDuration().split(":")[0]);
-                        int durationMins = Integer.parseInt(appointment.getDuration().split(":")[1]);
+                        String[] duration = appointment.getDuration().split(":");
+                        int durationHours = (duration.length > 0)?Integer.parseInt(duration[0]):0;
+                        int durationMins = (duration.length > 1)?Integer.parseInt(duration[1]):0;
                         endTimeOfAppointment.add(Calendar.HOUR_OF_DAY, durationHours);
                         endTimeOfAppointment.add(Calendar.MINUTE, durationMins);
 
-                        for (int j = 0; j < listOfAvailableSlots.size();j++) {
-
-                            String hour = listOfAvailableSlots.get(j);
-                            Calendar endTime = createTime(hour);
-
-                            if(endTimeOfAppointment.compareTo(endTime) >= 0) {
-                                listOfAvailableSlots.remove(j);
+                        for (Iterator<String> iterator = listOfAvailableSlots.iterator(); iterator.hasNext();) {
+                            String hour = iterator.next();
+                            if (hour.isEmpty()) {
+                                // Remove the current element from the iterator and the list.
+                                Calendar endTime = createTime(hour);
+                                if(endTimeOfAppointment.compareTo(endTime) >= 0) {
+                                    iterator.remove();
+                                }
                             }
                         }
+//
+//                        for (int j = 0; j < listOfAvailableSlots.size();j++) {
+//
+//                            String hour = listOfAvailableSlots.get(j);
+//                            Calendar endTime = createTime(hour);
+//
+//                            if(endTimeOfAppointment.compareTo(endTime) >= 0) {
+//                                listOfAvailableSlots.remove(j);
+//                            }
+//                        }
 
                     }
 
