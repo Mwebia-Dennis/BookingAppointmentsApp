@@ -210,7 +210,7 @@ public class AppointmentDatesActivity extends AppCompatActivity {
 
                     List<Appointment> appointmentArrayList = queryDocumentSnapshots.toObjects(Appointment.class);
                     //check if the timeslot is booked
-//                    List<String> availableSlots = listOfAvailableSlots;
+                    List<String> newAvailableList = listOfAvailableSlots;
 
                     for (Appointment appointment: appointmentArrayList) {
 
@@ -224,30 +224,19 @@ public class AppointmentDatesActivity extends AppCompatActivity {
                         endTimeOfAppointment.add(Calendar.HOUR_OF_DAY, durationHours);
                         endTimeOfAppointment.add(Calendar.MINUTE, durationMins);
 
-                        for (Iterator<String> iterator = listOfAvailableSlots.iterator(); iterator.hasNext();) {
-                            String hour = iterator.next();
-                            if (!hour.isEmpty()) {
-                                // Remove the current element from the iterator and the list.
-                                Calendar endTime = createTime(hour);
-                                if(endTimeOfAppointment.compareTo(endTime) >= 0) {
-                                    iterator.remove();
-                                }
+                        for (int j = 0; j < listOfAvailableSlots.size();j++) {
+
+                            String hour = listOfAvailableSlots.get(j);
+                            Calendar endTime = createTime(hour);
+
+                            if(endTimeOfAppointment.compareTo(endTime) >= 0) {
+                                newAvailableList.remove(j);
                             }
                         }
-//
-//                        for (int j = 0; j < listOfAvailableSlots.size();j++) {
-//
-//                            String hour = listOfAvailableSlots.get(j);
-//                            Calendar endTime = createTime(hour);
-//
-//                            if(endTimeOfAppointment.compareTo(endTime) >= 0) {
-//                                listOfAvailableSlots.remove(j);
-//                            }
-//                        }
 
                     }
 
-                    displayAvailableHourSlots(listOfAvailableSlots);
+                    displayAvailableHourSlots(newAvailableList);
 
 
                 });
