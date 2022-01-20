@@ -230,7 +230,7 @@ public class AppointmentDatesActivity extends AppCompatActivity {
                             Calendar endTime = createTime(hour);
 
                             if(endTimeOfAppointment.compareTo(endTime) >= 0) {
-                                newAvailableList.remove(j);
+                                if(newAvailableList.contains(hour)) newAvailableList.remove(newAvailableList.indexOf(hour));
                             }
                         }
 
