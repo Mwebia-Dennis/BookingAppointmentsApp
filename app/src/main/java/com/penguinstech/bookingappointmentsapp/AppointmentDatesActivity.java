@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,6 +48,7 @@ public class AppointmentDatesActivity extends AppCompatActivity {
     Company company;
     Appointment appointment = new Appointment();
     LinearLayout timeSlotsLL;
+    static final String topic = "notifications";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -333,7 +335,6 @@ public class AppointmentDatesActivity extends AppCompatActivity {
             this.appointment = appointment;
             this.context = context;
             this.company = company;
-            FirebaseApp.initializeApp(context);
             db = FirebaseFirestore.getInstance();
         }
 
@@ -367,7 +368,6 @@ public class AppointmentDatesActivity extends AppCompatActivity {
                     ref.set(appointment)
                             .addOnSuccessListener(documentReference -> {
                                 clientInformationForm.dismiss();
-                                Toast.makeText(context, "Successfully added appointment", Toast.LENGTH_SHORT).show();
                                 Intent intent = new Intent(context, BookingConfirmationActivity.class);
 //                                intent.putExtra("selectedServicesList", (Serializable) selectedServices);
                                 intent.putExtra("appointment", appointment);

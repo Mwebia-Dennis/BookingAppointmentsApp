@@ -84,7 +84,7 @@ public class CompanyAdapter extends RecyclerView.Adapter<CompanyAdapter.ViewHold
         db.collection("company_appointments")
                 .document(companyId)
                 .collection("appointments")
-                .whereEqualTo("notificationStatus", NotificationStatus.UNREAD)
+                .whereNotEqualTo("notificationStatus", NotificationStatus.READ)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     if (!queryDocumentSnapshots.isEmpty()) {

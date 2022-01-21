@@ -27,6 +27,7 @@ import com.penguinstech.bookingappointmentsapp.MainActivity;
 import com.penguinstech.bookingappointmentsapp.NotificationsActivity;
 import com.penguinstech.bookingappointmentsapp.R;
 import com.penguinstech.bookingappointmentsapp.model.Appointment;
+import com.penguinstech.bookingappointmentsapp.model.NotificationStatus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,6 +63,8 @@ public class AppointmentListenerService extends Service {
         super.onStartCommand(intent, flags, startId);
 
         this.companyIds = intent.getStringArrayListExtra("companyIds");
+
+
         listenToAppointmentChanges();
         return START_STICKY;//restart even when app is killed
     }
@@ -87,13 +90,22 @@ public class AppointmentListenerService extends Service {
                                 //new data has been added
                                 //show notification
                                 Appointment appointment = dc.getDocument().toObject(Appointment.class);
+                                if (appointment.getNotificationStatus().equals(NotificationStatus.UNREAD)) {
 
-                                StringBuilder message = new StringBuilder().append(appointment.getClient().getFullName())
-                                        .append(" requested an appointment with your company");
-                                if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O)
-                                    startMyOwnForeground(String.valueOf(message), notifId);
-                                else
-                                    showNotification(String.valueOf(message), notifId);
+                                    //UPDATE STATUS TO NOTIFICATION RECEIVED
+                                    db.collection("company_appointments")
+                                            .document(companyId)
+                                            .collection("appointments")
+                                            .document(appointment.getFirebaseId()).update("notificationStatus", NotificationStatus.RECEIVED);
+                                    //SHOW NOTIFICATION
+                                    StringBuilder message = new StringBuilder().append(appointment.getClient().getFullName())
+                                            .append(" requested an appointment with your company");
+                                    if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O)
+                                        startMyOwnForeground(String.valueOf(message), notifId);
+                                    else
+                                        showNotification(String.valueOf(message), notifId);
+                                }
+
                             }
                             notifId++;
                         }
@@ -121,8 +133,9 @@ public class AppointmentListenerService extends Service {
     }
 
     private void showNotification(String message, int notifId) {
+        Intent intent = new Intent(this, NotificationsActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         PendingIntent pendingIntent =
-                PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), 0);
+                PendingIntent.getActivity(this, 0, intent, 0);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID);
         notificationBuilder
                 .setContentTitle("New Appointment Request")
@@ -136,18 +149,23 @@ public class AppointmentListenerService extends Service {
             notificationBuilder.setPriority(NotificationManager.IMPORTANCE_MIN);
         }
         Notification notification = notificationBuilder.build();
-        startForeground(notifId, notification);
+//        startForeground(notifId, notification);
+        ((NotificationManager) getSystemService(Service.NOTIFICATION_SERVICE)).notify(notifId, notification);
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
+//    @Override
+//    public void onDestroy() {
+//        super.onDestroy();
+//    }
 
+    @Override
+    public void onTaskRemoved(Intent rootIntent) {
         Log.i("service:destroy", "true");
         Intent broadcastIntent = new Intent();
         broadcastIntent.putStringArrayListExtra("companyIds", companyIds);
         broadcastIntent.setAction("restart_service");
         broadcastIntent.setClass(this, RestartServiceReceiver.class);
         this.sendBroadcast(broadcastIntent);
+        super.onTaskRemoved(rootIntent);
     }
 }
