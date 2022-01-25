@@ -6,10 +6,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.ActivityManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.os.Parcelable;
 import android.util.Log;
 import android.view.Menu;
@@ -97,6 +100,18 @@ public class MainActivity extends AppCompatActivity {
             serviceIntent = new Intent(this, service.getClass());
             serviceIntent.putStringArrayListExtra("companyIds", companyIds);
             startService(serviceIntent);
+            MainActivity.this.bindService(serviceIntent, new ServiceConnection() {
+                @Override
+                public void onServiceConnected(ComponentName name, IBinder service) {
+                    //retrieve an instance of the service here from the IBinder returned
+                    //from the onBind method to communicate with
+                    Log.i("Service: Binding", "successful");
+                }
+
+                @Override
+                public void onServiceDisconnected(ComponentName name) {
+                }
+            }, Context.BIND_AUTO_CREATE);
         }
     }
 
