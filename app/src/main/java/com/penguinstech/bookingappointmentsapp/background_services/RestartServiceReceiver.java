@@ -33,19 +33,10 @@ public class RestartServiceReceiver extends BroadcastReceiver {
         Log.i("receiver:service", "restarted");
         Intent serviceIntent = new Intent(context, AppointmentListenerService.class);
         serviceIntent.putStringArrayListExtra("companyIds", intent.getStringArrayListExtra("companyIds"));
-        context.startService(serviceIntent);
-        context.bindService(serviceIntent, new ServiceConnection() {
-            @Override
-            public void onServiceConnected(ComponentName name, IBinder service) {
-                //retrieve an instance of the service here from the IBinder returned
-                //from the onBind method to communicate with
-                Log.i("Service: Binding", "successful");
-            }
-
-            @Override
-            public void onServiceDisconnected(ComponentName name) {
-            }
-        }, Context.BIND_AUTO_CREATE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+            context.startForegroundService(serviceIntent);
+        else
+            context.startService(serviceIntent);
     }
 
 }

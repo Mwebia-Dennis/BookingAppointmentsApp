@@ -53,6 +53,7 @@ public class AppointmentListenerService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        startForeground(1, new Notification());
 
         Log.i("service:create", "true");
 //        android.os.Debug.waitForDebugger();
@@ -62,6 +63,7 @@ public class AppointmentListenerService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
 
+        stopForeground(true);//remove the notification
         this.companyIds = intent.getStringArrayListExtra("companyIds");
 
 

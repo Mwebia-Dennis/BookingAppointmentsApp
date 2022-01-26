@@ -99,19 +99,10 @@ public class MainActivity extends AppCompatActivity {
         if (!isMyServiceRunning(service.getClass())) {
             serviceIntent = new Intent(this, service.getClass());
             serviceIntent.putStringArrayListExtra("companyIds", companyIds);
-            startService(serviceIntent);
-            MainActivity.this.bindService(serviceIntent, new ServiceConnection() {
-                @Override
-                public void onServiceConnected(ComponentName name, IBinder service) {
-                    //retrieve an instance of the service here from the IBinder returned
-                    //from the onBind method to communicate with
-                    Log.i("Service: Binding", "successful");
-                }
-
-                @Override
-                public void onServiceDisconnected(ComponentName name) {
-                }
-            }, Context.BIND_AUTO_CREATE);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                startForegroundService(serviceIntent);
+            else
+                startService(serviceIntent);
         }
     }
 
