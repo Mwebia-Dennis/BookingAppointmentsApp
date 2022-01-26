@@ -50,10 +50,23 @@ public class AppointmentListenerService extends Service {
         return null;
     }
 
+
+    String channelName = "Appointment Background Service";
     @Override
     public void onCreate() {
         super.onCreate();
-        startForeground(1, new Notification());
+        NotificationChannel chan;
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O) {
+            chan = new NotificationChannel(NOTIFICATION_CHANNEL_ID, channelName, NotificationManager.IMPORTANCE_NONE);
+            chan.setLightColor(Color.BLUE);
+            chan.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
+            NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            assert manager != null;
+            manager.createNotificationChannel(chan);
+        }
+
+
+        startForeground(1, getNotification("Starting service"));
 
         Log.i("service:create", "true");
 //        android.os.Debug.waitForDebugger();
@@ -121,7 +134,6 @@ public class AppointmentListenerService extends Service {
     @RequiresApi(Build.VERSION_CODES.O)
     private void startMyOwnForeground(String message, int notifId)
     {
-        String channelName = "Appointment Background Service";
         NotificationChannel chan = new NotificationChannel(NOTIFICATION_CHANNEL_ID, channelName, NotificationManager.IMPORTANCE_HIGH);
         chan.setLightColor(Color.BLUE);
         chan.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
@@ -135,6 +147,12 @@ public class AppointmentListenerService extends Service {
     }
 
     private void showNotification(String message, int notifId) {
+
+//        startForeground(notifId, notification);
+        ((NotificationManager) getSystemService(Service.NOTIFICATION_SERVICE)).notify(notifId, getNotification(message));
+    }
+
+    private Notification getNotification(String message){
         Intent intent = new Intent(this, NotificationsActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         PendingIntent pendingIntent =
                 PendingIntent.getActivity(this, 0, intent, 0);
@@ -150,9 +168,7 @@ public class AppointmentListenerService extends Service {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
             notificationBuilder.setPriority(NotificationManager.IMPORTANCE_MIN);
         }
-        Notification notification = notificationBuilder.build();
-//        startForeground(notifId, notification);
-        ((NotificationManager) getSystemService(Service.NOTIFICATION_SERVICE)).notify(notifId, notification);
+        return notificationBuilder.build();
     }
 
 //    @Override
