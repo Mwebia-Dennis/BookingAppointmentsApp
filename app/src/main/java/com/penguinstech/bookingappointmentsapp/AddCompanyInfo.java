@@ -22,9 +22,12 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.penguinstech.bookingappointmentsapp.adapters.BusinessDaysAdapter;
@@ -277,6 +280,24 @@ public class AddCompanyInfo extends AppCompatActivity {
             ref.set(company)
                     .addOnSuccessListener(documentReference -> {
                         Log.d("Adding Data: ", "Successful");
+
+                        //adding admin firebase messaging token
+                        FirebaseMessaging.getInstance().getToken().addOnCompleteListener(new OnCompleteListener<String>() {
+                            @Override
+                            public void onComplete(@NonNull Task<String> task) {
+                                if (!task.isSuccessful()) {
+                                    Log.w("token: ", "Fetching FCM registration token failed", task.getException());
+                                    return;
+                                }
+
+                                // Get new FCM registration token
+                                String token = task.getResult();
+                                company.setAdminMsgToken(token);
+                                db.collection("companies")
+                                        .document(company.getFirebaseId()).update("adminMsgToken", token);
+                            }
+                        });
+
                         //add images and update table
 
                         //add logo image

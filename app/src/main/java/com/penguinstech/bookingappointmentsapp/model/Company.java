@@ -6,7 +6,7 @@ import java.util.ArrayList;
 //NOTE: implementing serializable class will enable sharing of this object as a bundle between 2 activities
 public class Company implements Serializable {
 
-    private String firebaseId, companyName, ownerName, description, logo, photo, address, phone, email, website, instagram, facebook;
+    private String firebaseId, companyName, ownerName, description, logo, photo, address, phone, email, website, instagram, facebook, adminMsgToken;
     ArrayList<BusinessDay> businessDayList;
 
     public Company() {}
@@ -114,5 +114,13 @@ public class Company implements Serializable {
 
     public void setBusinessDayList(ArrayList<BusinessDay> businessDayList) {
         this.businessDayList = businessDayList;
+    }
+
+    public String getAdminMsgToken() {
+        return adminMsgToken;
+    }
+
+    public void setAdminMsgToken(String adminMsgToken) {
+        this.adminMsgToken = adminMsgToken;
     }
 }

@@ -24,6 +24,7 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.penguinstech.bookingappointmentsapp.adapters.BusinessDaysAdapter;
+import com.penguinstech.bookingappointmentsapp.background_services.FirebaseServerConfigs;
 import com.penguinstech.bookingappointmentsapp.model.Appointment;
 import com.penguinstech.bookingappointmentsapp.model.BusinessDay;
 import com.penguinstech.bookingappointmentsapp.model.BusinessHours;
@@ -31,14 +32,23 @@ import com.penguinstech.bookingappointmentsapp.model.Client;
 import com.penguinstech.bookingappointmentsapp.model.Company;
 import com.penguinstech.bookingappointmentsapp.model.Service;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 
 public class AppointmentDatesActivity extends AppCompatActivity {
 
@@ -323,6 +333,8 @@ public class AppointmentDatesActivity extends AppCompatActivity {
         return hours + ":" + minutes;
     }
 
+
+
     public  static class ClientInformationForm extends BottomSheetDialogFragment {
 
         private final Context context;
@@ -368,6 +380,24 @@ public class AppointmentDatesActivity extends AppCompatActivity {
                     ref.set(appointment)
                             .addOnSuccessListener(documentReference -> {
                                 clientInformationForm.dismiss();
+
+                                String notification;
+                                try {
+                                    notification = new JSONObject()
+                                            .put("to", company.getAdminMsgToken())
+                                            .put("notification",
+                                                    new JSONObject()
+                                                            .put("title", "New Appointment")
+                                                            .put("body", appointment.getClient().getFullName() +
+                                                                    " requested an appointment with your company")
+                                            )
+                                            .toString();
+                                    sendNotification(notification);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+
+                                //open confirmation page
                                 Intent intent = new Intent(context, BookingConfirmationActivity.class);
 //                                intent.putExtra("selectedServicesList", (Serializable) selectedServices);
                                 intent.putExtra("appointment", appointment);
@@ -385,5 +415,50 @@ public class AppointmentDatesActivity extends AppCompatActivity {
             });
             return view;
         }
+
+        public void sendNotification(String notification) {
+
+
+            // start thread for http connection
+            // send message to a specific phone token (adminId) via FCM
+            new Thread(()->{
+                URL url = null;
+                URLConnection con = null;
+                try {
+                    url = new URL(FirebaseServerConfigs.BASE_SERVER_URL + "fcm/send");
+                    con = url.openConnection();
+                    HttpURLConnection http = (HttpURLConnection)con;
+                    http.setRequestProperty("Content-Type", FirebaseServerConfigs.CONTENT_TYPE);
+                    http.setRequestProperty("Authorization", "key="+FirebaseServerConfigs.SERVER_KEY);
+                    http.setRequestMethod("POST");
+
+                    byte[] out = notification.getBytes(StandardCharsets.UTF_8);
+                    http.setFixedLengthStreamingMode( out.length);
+                    http.connect();
+                    try(OutputStream os = http.getOutputStream()) {
+                        os.write(out);
+                    }catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                    InputStream in = http.getInputStream();
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+                    StringBuilder result = new StringBuilder();
+                    String line;
+                    while((line = reader.readLine()) != null) {
+                        result.append(line);
+                    }
+                    in.close();
+                    Log.i("input stream", String.valueOf(result));
+//                    Toast.makeText(context, "message: "+result, Toast.LENGTH_SHORT).show();
+//                http.setDoOutput(true);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }).start();
+
+
+
+        }
+
     }
 }

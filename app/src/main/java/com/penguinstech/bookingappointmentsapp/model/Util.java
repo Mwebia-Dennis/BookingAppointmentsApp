@@ -7,6 +7,9 @@ import android.provider.MediaStore;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.UUID;
 
 public class Util {
