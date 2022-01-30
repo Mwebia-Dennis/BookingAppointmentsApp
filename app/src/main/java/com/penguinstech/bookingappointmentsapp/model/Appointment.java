@@ -5,7 +5,7 @@ import java.io.Serializable;
 public class Appointment implements Serializable {
 
     Client client;
-    String firebaseId, date, duration, startTime, totalPrice, companyId;
+    String firebaseId, date, duration, startTime, totalPrice, companyId, companyTimeZone;
     String appointmentStatus = AppointmentStatus.PENDING;
     String notificationStatus = NotificationStatus.UNREAD;
     String serviceIds;//a list of service id that are joined to form a string separated by a comma
@@ -99,5 +99,13 @@ public class Appointment implements Serializable {
 
     public void setTotalPrice(String totalPrice) {
         this.totalPrice = totalPrice;
+    }
+
+    public String getCompanyTimeZone() {
+        return companyTimeZone;
+    }
+
+    public void setCompanyTimeZone(String companyTimeZone) {
+        this.companyTimeZone = companyTimeZone;
     }
 }

@@ -16,14 +16,19 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.penguinstech.bookingappointmentsapp.AppointmentDatesActivity;
 import com.penguinstech.bookingappointmentsapp.BookingConfirmationActivity;
 import com.penguinstech.bookingappointmentsapp.R;
 import com.penguinstech.bookingappointmentsapp.model.Appointment;
 import com.penguinstech.bookingappointmentsapp.model.AppointmentStatus;
 
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
 
 public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.ViewHolder> {
 
@@ -51,9 +56,22 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         Appointment appointment = appointmentList.get(position);
         holder.msgTv.setText(new StringBuilder().append(appointment.getClient().getFullName())
                 .append(" requested an appointment with your company"));
-        holder.appointmentDetailsTv.setText(new StringBuilder().append(appointment.getDate())
-                .append(" at ")
-                .append(appointment.getStartTime()).append(" ")
+
+        SimpleDateFormat dateFormat=new SimpleDateFormat("EEE, d MMM yyyy", Locale.ENGLISH);
+        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(appointment.getCompanyTimeZone()));
+        try {
+            calendar.setTime(dateFormat.parse(appointment.getDate()));
+            Calendar time = AppointmentDatesActivity.createTime(appointment.getStartTime());
+            calendar.set(Calendar.HOUR, time.get(Calendar.HOUR));
+            calendar.set(Calendar.MINUTE, time.get(Calendar.MINUTE));
+            calendar.set(Calendar.AM_PM, time.get(Calendar.AM_PM));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        dateFormat.applyPattern("EEE, d MMM yyyy HH:mm:ss");
+        dateFormat.setTimeZone(TimeZone.getDefault());
+        holder.appointmentDetailsTv.setText(new StringBuilder().append(dateFormat.format(calendar.getTime()))
+                .append(". Services: ")
                 .append(appointment.getServiceIds())
         );
 

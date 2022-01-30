@@ -44,11 +44,13 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 
 public class AppointmentDatesActivity extends AppCompatActivity {
 
@@ -97,7 +99,6 @@ public class AppointmentDatesActivity extends AppCompatActivity {
                         company = queryDocumentSnapshots.toObjects(Company.class).get(0);
 
                         final Calendar selectedCalendar = Calendar.getInstance();
-
                         DatePickerDialog.OnDateSetListener dateSetListener = (view, year, month, day) -> {
                             selectedCalendar.set(Calendar.YEAR, year);
                             selectedCalendar.set(Calendar.MONTH,month);
@@ -108,14 +109,31 @@ public class AppointmentDatesActivity extends AppCompatActivity {
                         };
 
                         findViewById(R.id.selectDateBtn).setOnClickListener(V->{
+
+                            //get the current day and time in company timezone
+                            //then convert to local date
+                            //then limit calendar to that date
+                            Calendar date = Calendar.getInstance(TimeZone.getTimeZone(company.getTimeZoneId()));
+                            date.set(Calendar.HOUR_OF_DAY, 0);
+                            date.set(Calendar.MINUTE, 0);
+                            //convert the date to default time zone
+                            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH);
+                            String _date = format.format(date.getTime());
+                            format.setTimeZone(TimeZone.getDefault());
                             DatePickerDialog datePickerDialog = new DatePickerDialog(
                                     AppointmentDatesActivity.this,
                                     dateSetListener,
                                     selectedCalendar.get(Calendar.YEAR),
                                     selectedCalendar.get(Calendar.MONTH),
                                     selectedCalendar.get(Calendar.DAY_OF_MONTH));
-                            datePickerDialog.getDatePicker().setMinDate(Calendar.getInstance().getTimeInMillis());
-                            datePickerDialog.show();
+
+                            try {
+                                date.setTime(format.parse(_date));
+                                datePickerDialog.getDatePicker().setMinDate(date.getTimeInMillis());
+                                datePickerDialog.show();
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                            }
                         });
                     }
                 }).addOnFailureListener(e-> {
@@ -136,7 +154,7 @@ public class AppointmentDatesActivity extends AppCompatActivity {
                  * remove ClientInformationForm (popup) class
                  */
                 new ClientInformationForm(AppointmentDatesActivity.this, appointment, company)
-                    .show(getSupportFragmentManager(), "AddClientInfoPopUp");
+                        .show(getSupportFragmentManager(), "AddClientInfoPopUp");
 
 //                appointment.setClient(
 //                        new Client("client full name",
@@ -276,6 +294,9 @@ public class AppointmentDatesActivity extends AppCompatActivity {
         String myFormat="MM/dd/yy";
         SimpleDateFormat dateFormat=new SimpleDateFormat(myFormat, Locale.US);
         dateFormat.applyPattern("EEE, d MMM yyyy");
+        // since the date is in the current host (phone) timezone,
+        // we have to convert to the company's default timezone for saving
+        dateFormat.setTimeZone(TimeZone.getTimeZone(company.getTimeZoneId()));
         appointment.setDate(dateFormat.format(myCalendar.getTime()));
         TextView tv = findViewById(R.id.selectedDateTv);
         tv.setText(new StringBuilder().append("Selected Date is: ").append(dateFormat.format(myCalendar.getTime())));
@@ -302,7 +323,7 @@ public class AppointmentDatesActivity extends AppCompatActivity {
         return button;
     }
 
-    private static Calendar createTime(String time) {
+    public static Calendar createTime(String time) {
 
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(time.split(":")[0]));
@@ -360,7 +381,7 @@ public class AppointmentDatesActivity extends AppCompatActivity {
             view.findViewById(R.id.bookAppointmentBtn).setOnClickListener(v->{
 
                 if(!fullNameEt.getText().toString().trim().equals("") && !emailEt.getText().toString().trim().equals("")
-                    && !phoneNoEt.getText().toString().trim().equals("")
+                        && !phoneNoEt.getText().toString().trim().equals("")
                 ) {
 
                     appointment.setClient(
@@ -377,6 +398,7 @@ public class AppointmentDatesActivity extends AppCompatActivity {
                             .document();
                     appointment.setFirebaseId(ref.getId());
                     appointment.setCompanyId(company.getFirebaseId());
+                    appointment.setCompanyTimeZone(company.getTimeZoneId());
                     ref.set(appointment)
                             .addOnSuccessListener(documentReference -> {
                                 clientInformationForm.dismiss();
