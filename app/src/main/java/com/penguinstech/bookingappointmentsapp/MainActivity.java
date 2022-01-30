@@ -23,6 +23,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.penguinstech.bookingappointmentsapp.adapters.CompanyAdapter;
 import com.penguinstech.bookingappointmentsapp.background_services.AppointmentListenerService;
 import com.penguinstech.bookingappointmentsapp.background_services.RestartServiceReceiver;
@@ -124,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
 
                         //convert whole queryDocumentSnapshots to list
                         companyList = queryDocumentSnapshots.toObjects(Company.class);
-                        startBackgroundService();
+//                        startBackgroundService();
                         RecyclerView recyclerView = findViewById(R.id.mainRv);
                         recyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this, LinearLayoutManager.VERTICAL, false));
                         CompanyAdapter adapter = new CompanyAdapter(MainActivity.this, companyList);
@@ -140,16 +141,16 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
 
-        if(serviceIntent != null) {
-
-            Log.i("closed", "intent");
-            stopService(serviceIntent);
-            Intent broadcastIntent = new Intent();
-            broadcastIntent.putStringArrayListExtra("companyIds", serviceIntent.getStringArrayListExtra("companyIds"));
-            broadcastIntent.setAction("restart_service");
-            broadcastIntent.setClass(this, RestartServiceReceiver.class);
-            this.sendBroadcast(broadcastIntent);
-        }
+//        if(serviceIntent != null) {
+//
+//            Log.i("closed", "intent");
+//            stopService(serviceIntent);
+//            Intent broadcastIntent = new Intent();
+//            broadcastIntent.putStringArrayListExtra("companyIds", serviceIntent.getStringArrayListExtra("companyIds"));
+//            broadcastIntent.setAction("restart_service");
+//            broadcastIntent.setClass(this, RestartServiceReceiver.class);
+//            this.sendBroadcast(broadcastIntent);
+//        }
         super.onDestroy();
     }
 }
