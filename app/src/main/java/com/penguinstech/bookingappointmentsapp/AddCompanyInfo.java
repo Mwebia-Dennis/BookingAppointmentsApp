@@ -236,134 +236,149 @@ public class AddCompanyInfo extends AppCompatActivity {
     }
 
     private void saveCompanyDetails() {
-        if(name.getText().toString().trim().equals("")) {
-            //validate form, business name
-            name.setError("this field is required");
-            name.requestFocus();
-        }else {
 
-            company.setCompanyName(name.getText().toString().trim());
+        boolean hasSlots = false;
+        for(BusinessDay day:listOfBusinessDays) {
+            if(day.isChecked()) {
+                hasSlots = true;
+                break;
+            }
+        }
 
-            if(!des.getText().toString().trim().equals("")) {
-                company.setDescription(des.getText().toString().trim());
-            }
-            if(!address.getText().toString().trim().equals("")) {
-                company.setAddress(address.getText().toString().trim());
-            }
-            if(!phone.getText().toString().trim().equals("")) {
-                company.setPhone(phone.getText().toString().trim());
-            }
-            if(!email.getText().toString().trim().equals("")) {
-                company.setEmail(email.getText().toString().trim());
-            }
-            if(!website.getText().toString().trim().equals("")) {
-                company.setWebsite(website.getText().toString().trim());
-            }
-            if(!instagram.getText().toString().trim().equals("")) {
-                company.setInstagram(instagram.getText().toString().trim());
-            }
-            if(!facebook.getText().toString().trim().equals("")) {
-                company.setFacebook(facebook.getText().toString().trim());
-            }
-            company.setOwnerName(Util.owner);
-            company.setBusinessDayList(listOfBusinessDays);
+        if(hasSlots) {
 
-            Toast.makeText(this, "loading please wait...", Toast.LENGTH_SHORT).show();
-            DocumentReference ref;
-            if(!isEditing){
 
-                ref = db.collection("companies").document();
-                company.setFirebaseId(ref.getId());
-                company.setTimeZoneId(TimeZone.getDefault().getID());
-            }else {
-                ref = db.collection("companies").document(company.getFirebaseId());
-            }
+            if (name.getText().toString().trim().equals("")) {
+                //validate form, business name
+                name.setError("this field is required");
+                name.requestFocus();
+            } else {
 
-            ref.set(company)
-                    .addOnSuccessListener(documentReference -> {
-                        Log.d("Adding Data: ", "Successful");
+                company.setCompanyName(name.getText().toString().trim());
 
-                        //adding admin firebase messaging token
-                        FirebaseMessaging.getInstance().getToken().addOnCompleteListener(new OnCompleteListener<String>() {
-                            @Override
-                            public void onComplete(@NonNull Task<String> task) {
-                                if (!task.isSuccessful()) {
-                                    Log.w("token: ", "Fetching FCM registration token failed", task.getException());
-                                    return;
+                if (!des.getText().toString().trim().equals("")) {
+                    company.setDescription(des.getText().toString().trim());
+                }
+                if (!address.getText().toString().trim().equals("")) {
+                    company.setAddress(address.getText().toString().trim());
+                }
+                if (!phone.getText().toString().trim().equals("")) {
+                    company.setPhone(phone.getText().toString().trim());
+                }
+                if (!email.getText().toString().trim().equals("")) {
+                    company.setEmail(email.getText().toString().trim());
+                }
+                if (!website.getText().toString().trim().equals("")) {
+                    company.setWebsite(website.getText().toString().trim());
+                }
+                if (!instagram.getText().toString().trim().equals("")) {
+                    company.setInstagram(instagram.getText().toString().trim());
+                }
+                if (!facebook.getText().toString().trim().equals("")) {
+                    company.setFacebook(facebook.getText().toString().trim());
+                }
+                company.setOwnerName(Util.owner);
+                company.setBusinessDayList(listOfBusinessDays);
+
+                Toast.makeText(this, "loading please wait...", Toast.LENGTH_SHORT).show();
+                DocumentReference ref;
+                if (!isEditing) {
+
+                    ref = db.collection("companies").document();
+                    company.setFirebaseId(ref.getId());
+                    company.setTimeZoneId(TimeZone.getDefault().getID());
+                } else {
+                    ref = db.collection("companies").document(company.getFirebaseId());
+                }
+
+                ref.set(company)
+                        .addOnSuccessListener(documentReference -> {
+                            Log.d("Adding Data: ", "Successful");
+
+                            //adding admin firebase messaging token
+                            FirebaseMessaging.getInstance().getToken().addOnCompleteListener(new OnCompleteListener<String>() {
+                                @Override
+                                public void onComplete(@NonNull Task<String> task) {
+                                    if (!task.isSuccessful()) {
+                                        Log.w("token: ", "Fetching FCM registration token failed", task.getException());
+                                        return;
+                                    }
+
+                                    // Get new FCM registration token
+                                    String token = task.getResult();
+                                    company.setAdminMsgToken(token);
+                                    db.collection("companies")
+                                            .document(company.getFirebaseId()).update("adminMsgToken", token);
                                 }
+                            });
 
-                                // Get new FCM registration token
-                                String token = task.getResult();
-                                company.setAdminMsgToken(token);
-                                db.collection("companies")
-                                        .document(company.getFirebaseId()).update("adminMsgToken", token);
+                            //add images and update table
+
+                            //add logo image
+                            if (logoUri != null) {
+                                Toast.makeText(AddCompanyInfo.this, "Logo image saving in background", Toast.LENGTH_SHORT).show();
+                                storageRef.child(UUID.randomUUID().toString()).putFile(logoUri)
+                                        .addOnCompleteListener(task -> {
+
+                                            task.getResult().getStorage().getDownloadUrl().addOnSuccessListener(uri -> {
+                                                db.collection("companies")
+                                                        .document(company.getFirebaseId()).update("logo", uri.toString()).addOnSuccessListener(aVoid -> {
+
+                                                    Log.i("logo upload: ", "Successful");
+                                                }).addOnFailureListener(e -> {
+
+                                                    Log.i("logo upload: ", "failed");
+                                                });
+
+
+                                            });
+
+                                        })
+                                        .addOnFailureListener(e -> {
+
+                                            Log.i("logo upload: ", "failed");
+                                        });
                             }
+
+                            //add business photo image
+
+
+                            if (businessPhotoUri != null) {
+                                Toast.makeText(AddCompanyInfo.this, "Business Photo saving in background", Toast.LENGTH_SHORT).show();
+                                storageRef.child(UUID.randomUUID().toString()).putFile(businessPhotoUri)
+                                        .addOnCompleteListener(task -> {
+
+                                            task.getResult().getStorage().getDownloadUrl().addOnSuccessListener(uri -> {
+                                                db.collection("companies")
+                                                        .document(company.getFirebaseId()).update("photo", uri.toString()).addOnSuccessListener(aVoid -> {
+
+                                                    Log.i("photo upload: ", "Successful");
+                                                }).addOnFailureListener(e -> {
+
+                                                    Log.i("photo upload: ", "failed");
+                                                });
+
+
+                                            });
+
+                                        })
+                                        .addOnFailureListener(e -> {
+
+                                            Log.i("photo upload: ", "failed");
+                                        });
+                            }
+
+                            onBackPressed();
+                        })
+                        .addOnFailureListener(e -> {
+                            Log.d("Adding Data", "Failed");
                         });
-
-                        //add images and update table
-
-                        //add logo image
-                        if(logoUri != null) {
-                            Toast.makeText(AddCompanyInfo.this, "Logo image saving in background", Toast.LENGTH_SHORT).show();
-                            storageRef.child(UUID.randomUUID().toString()).putFile(logoUri)
-                                    .addOnCompleteListener(task -> {
-
-                                        task.getResult().getStorage().getDownloadUrl().addOnSuccessListener(uri -> {
-                                            db.collection("companies")
-                                                    .document(company.getFirebaseId()).update("logo", uri.toString()).addOnSuccessListener(aVoid->{
-
-                                                        Log.i("logo upload: ", "Successful");
-                                            }).addOnFailureListener(e-> {
-
-                                                Log.i("logo upload: ", "failed");
-                                            });
-
-
-                                        });
-
-                                    })
-                                    .addOnFailureListener(e -> {
-
-                                        Log.i("logo upload: ", "failed");
-                                    });
-                        }
-
-                        //add business photo image
-
-
-                        if(businessPhotoUri != null) {
-                            Toast.makeText(AddCompanyInfo.this, "Business Photo saving in background", Toast.LENGTH_SHORT).show();
-                            storageRef.child(UUID.randomUUID().toString()).putFile(businessPhotoUri)
-                                    .addOnCompleteListener(task -> {
-
-                                        task.getResult().getStorage().getDownloadUrl().addOnSuccessListener(uri -> {
-                                            db.collection("companies")
-                                                    .document(company.getFirebaseId()).update("photo", uri.toString()).addOnSuccessListener(aVoid->{
-
-                                                Log.i("photo upload: ", "Successful");
-                                            }).addOnFailureListener(e-> {
-
-                                                Log.i("photo upload: ", "failed");
-                                            });
-
-
-                                        });
-
-                                    })
-                                    .addOnFailureListener(e -> {
-
-                                        Log.i("photo upload: ", "failed");
-                                    });
-                        }
-
-                        onBackPressed();
-                    })
-                    .addOnFailureListener(e -> {
-                        Log.d("Adding Data", "Failed");
-                    });
 //            Log.i("name", company.getCompanyName());
 
 
+            }
+        }else {
+            Toast.makeText(AddCompanyInfo.this, "You have not selected any slot", Toast.LENGTH_SHORT).show();
         }
     }
 
