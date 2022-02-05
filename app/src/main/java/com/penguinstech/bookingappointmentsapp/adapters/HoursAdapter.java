@@ -104,7 +104,7 @@ public class HoursAdapter  extends RecyclerView.Adapter<HoursAdapter.ViewHolder>
     private void changeStartTime( int position, View v) {
         String currentTime = businessHourList.get(position).getStartTime();
         Calendar mcurrentTime = Calendar.getInstance();
-        mcurrentTime.set(Calendar.HOUR_OF_DAY, Integer.parseInt(currentTime.split(":")[0]));
+        mcurrentTime.set(Calendar.HOUR, Integer.parseInt(currentTime.split(":")[0]));
         mcurrentTime.set(Calendar.MINUTE, Integer.parseInt(currentTime.split(":")[1].split(" ")[0]));
         mcurrentTime.set(Calendar.AM_PM,
                 currentTime.split(":")[1].split(" ")[1].toLowerCase().equals("am")?Calendar.AM:Calendar.PM
@@ -179,7 +179,7 @@ public class HoursAdapter  extends RecyclerView.Adapter<HoursAdapter.ViewHolder>
     private void changeEndTime( int position, View v) {
         String currentTime = businessHourList.get(position).getEndTime();
         Calendar mcurrentTime = Calendar.getInstance();
-        mcurrentTime.set(Calendar.HOUR_OF_DAY, Integer.parseInt(currentTime.split(":")[0]));
+        mcurrentTime.set(Calendar.HOUR, Integer.parseInt(currentTime.split(":")[0]));
         mcurrentTime.set(Calendar.MINUTE, Integer.parseInt(currentTime.split(":")[1].split(" ")[0]));
         mcurrentTime.set(Calendar.AM_PM,
                 currentTime.split(":")[1].split(" ")[1].toLowerCase().equals("am")?Calendar.AM:Calendar.PM
