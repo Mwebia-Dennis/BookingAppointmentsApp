@@ -369,14 +369,16 @@ public class AppointmentDatesActivity extends AppCompatActivity {
                                 String date_time = listOfAvailableSlots.get(j);
                                 Calendar endTime = Calendar.getInstance(TimeZone.getTimeZone(company.getTimeZoneId()));
                                 endTime.setTime(FORMAT.parse(date_time));
-                                Log.i("endTime", FORMAT.format(endTime.getTime()));
-                                Log.i("endTimeOfAppointment", FORMAT.format(endTimeOfAppointment.getTime()));
 
                                 if(endTimeOfAppointment.compareTo(endTime) >= 0 && endTime.compareTo(startTimeOfAppointment) >= 0) {
                                     if(newAvailableList.contains(date_time)) {
                                         //remove data
                                         newAvailableList.remove(newAvailableList.indexOf(date_time));
                                     }
+                                }
+                                //remove start time of appointment from list too
+                                if(newAvailableList.contains(appointment.getDate())) {
+                                    newAvailableList.remove(newAvailableList.indexOf(appointment.getDate()));
                                 }
                             }
                         } catch (ParseException e) {
@@ -393,91 +395,6 @@ public class AppointmentDatesActivity extends AppCompatActivity {
                     Log.i("firebase:error", e.getMessage());
                 });
     }
-
-//    private void getAvailableTimeSlots(Calendar selectedCalendar) {
-//
-//
-//        String dayOfWeek = new SimpleDateFormat("EEEE", Locale.ENGLISH).format(selectedCalendar.getTime());
-//        //check if day has scheduled slots
-//        for (int i = 0; i < company.getBusinessDayList().size();i++) {
-//            BusinessDay businessDay  = company.getBusinessDayList().get(i);
-//            if (businessDay.getDay().toLowerCase().equals(dayOfWeek.toLowerCase())) {
-//                if (businessDay.isChecked()) {
-//                    //get the business hours
-//                    ArrayList<String> listOfAvailableSlots = new ArrayList<>();
-//                    for (BusinessHours hour : businessDay.getListOfBusinessHours()) {
-//                        //first add the start time
-//                        //then add one hour to slot as long as its not above end time
-//                        listOfAvailableSlots.add(hour.getStartTime());
-//                        Calendar endTime = createTime(hour.getEndTime());
-//                        Calendar nextSlot = createTime(hour.getStartTime());
-//                        nextSlot.add(Calendar.HOUR_OF_DAY, 1);
-//                        //add one hour until we exceed the end time
-//
-//                        while (nextSlot.compareTo(endTime) < 0) {
-//                            listOfAvailableSlots.add(BusinessDaysAdapter.sdf.format(nextSlot.getTime()));
-//                            nextSlot.add(Calendar.HOUR_OF_DAY, 1);
-//                        }
-//
-//                    }
-//
-//                    getUnbookedAppointments(listOfAvailableSlots);
-//
-//
-//                }else {
-//                    Toast.makeText(AppointmentDatesActivity.this, "Sorry there are no available time slots for this day", Toast.LENGTH_SHORT).show();
-//                }
-//            }
-//        }
-//
-//
-//
-//
-//
-//    }
-//
-//    private void getUnbookedAppointments(List<String> listOfAvailableSlots) {
-//
-//        //get appointments that are already scheduled for this day
-//        db.collection("company_appointments")
-//                .document(company.getFirebaseId())
-//                .collection("appointments").whereEqualTo("date", appointment.getDate())
-//                .get()
-//                .addOnSuccessListener(queryDocumentSnapshots -> {
-//
-//                    List<Appointment> appointmentArrayList = queryDocumentSnapshots.toObjects(Appointment.class);
-//                    //check if the timeslot is booked
-//                    List<String> newAvailableList = listOfAvailableSlots;
-//
-//                    for (Appointment appointment: appointmentArrayList) {
-//
-//
-//                        //change availability of the time slots
-//                        Calendar endTimeOfAppointment = createTime(appointment.getStartTime());
-//                        //add duration to time
-//                        String[] duration = appointment.getDuration().split(":");
-//                        int durationHours = (duration.length > 0)?Integer.parseInt(duration[0]):0;
-//                        int durationMins = (duration.length > 1)?Integer.parseInt(duration[1]):0;
-//                        endTimeOfAppointment.add(Calendar.HOUR_OF_DAY, durationHours);
-//                        endTimeOfAppointment.add(Calendar.MINUTE, durationMins);
-//
-//                        for (int j = 0; j < listOfAvailableSlots.size();j++) {
-//
-//                            String hour = listOfAvailableSlots.get(j);
-//                            Calendar endTime = createTime(hour);
-//
-//                            if(endTimeOfAppointment.compareTo(endTime) >= 0) {
-//                                if(newAvailableList.contains(hour)) newAvailableList.remove(newAvailableList.indexOf(hour));
-//                            }
-//                        }
-//
-//                    }
-//
-//                    displayAvailableHourSlots(newAvailableList);
-//
-//
-//                });
-//    }
 
 
     private void displayAvailableHourSlots(List<String> listOfAvailableSlots) {
@@ -542,6 +459,7 @@ public class AppointmentDatesActivity extends AppCompatActivity {
                 String timeStr = BusinessDaysAdapter.sdf.format(dateTime.getTime());
                 Calendar _dateTime = createTime(timeStr, date);
                 FORMAT.setTimeZone(TimeZone.getTimeZone(company.getTimeZoneId()));
+                Log.i("_dateTime", FORMAT.format(_dateTime.getTime()));
                 appointment.setDate(FORMAT.format(_dateTime.getTime()));
             } catch (ParseException e) {
                 e.printStackTrace();
