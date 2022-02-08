@@ -18,13 +18,14 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class    BusinessDaysAdapter extends RecyclerView.Adapter<BusinessDaysAdapter.ViewHolder> {
 
     private final List<BusinessDay> businessDayList;
     private final Context context;
 //    public static final long HOUR = 3600*1000;
-    public static final DateFormat sdf = new SimpleDateFormat("hh:mm a");
+    public static final DateFormat sdf = new SimpleDateFormat("HH:mm", Locale.ENGLISH);
     public BusinessDaysAdapter (Context context, List<BusinessDay> businessDayList) {
         this.businessDayList = businessDayList;
         this.context = context;

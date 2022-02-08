@@ -36,6 +36,7 @@ import com.penguinstech.bookingappointmentsapp.model.Util;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Objects;
+import java.util.TimeZone;
 import java.util.UUID;
 
 public class AddCompanyInfo extends AppCompatActivity {
@@ -270,6 +271,7 @@ public class AddCompanyInfo extends AppCompatActivity {
 
                 ref = db.collection("companies").document();
                 company.setFirebaseId(ref.getId());
+                company.setTimeZoneId(TimeZone.getDefault().getID());
             }else {
                 ref = db.collection("companies").document(company.getFirebaseId());
             }

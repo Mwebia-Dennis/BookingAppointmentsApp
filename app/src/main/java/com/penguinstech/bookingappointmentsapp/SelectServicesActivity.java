@@ -38,6 +38,11 @@ public class SelectServicesActivity extends AppCompatActivity {
         init();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
     private void init() {
 
 

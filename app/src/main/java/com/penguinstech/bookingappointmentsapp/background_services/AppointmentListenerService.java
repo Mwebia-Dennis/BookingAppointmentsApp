@@ -65,7 +65,6 @@ public class AppointmentListenerService extends Service {
             manager.createNotificationChannel(chan);
         }
 
-
         startForeground(1, getNotification("Starting service"));
 
         Log.i("service:create", "true");

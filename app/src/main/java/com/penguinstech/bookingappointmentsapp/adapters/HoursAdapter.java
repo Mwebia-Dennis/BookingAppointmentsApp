@@ -62,10 +62,7 @@ public class HoursAdapter  extends RecyclerView.Adapter<HoursAdapter.ViewHolder>
         holder.addNewHourBtn.setOnClickListener(v->{
             String endTime = businessHourList.get(businessHourList.size()-1).getEndTime();
             int hr = Integer.parseInt(endTime.split(":")[0]);
-            if(hr< 12 && endTime.split(":")[1].split(" ")[1].toLowerCase().equals("pm")) {
-                hr += 12;
-            }
-            if (hr == 12 && endTime.split(":")[1].split(" ")[1].toLowerCase().equals("am")) {
+            if (hr == 0) {
 
                 Snackbar.make(v,"Hey, 11.59 PM is the last hour of the day", Snackbar.LENGTH_LONG).show();
             }else {
@@ -106,9 +103,6 @@ public class HoursAdapter  extends RecyclerView.Adapter<HoursAdapter.ViewHolder>
         Calendar mcurrentTime = Calendar.getInstance();
         mcurrentTime.set(Calendar.HOUR_OF_DAY, Integer.parseInt(currentTime.split(":")[0]));
         mcurrentTime.set(Calendar.MINUTE, Integer.parseInt(currentTime.split(":")[1].split(" ")[0]));
-        mcurrentTime.set(Calendar.AM_PM,
-                currentTime.split(":")[1].split(" ")[1].toLowerCase().equals("am")?Calendar.AM:Calendar.PM
-        );
         TimePickerDialog timePickerDialog = new TimePickerDialog(context, (timePicker, selectedHour, selectedMinute) -> {
 
             Log.i("selected hour", String.valueOf(selectedHour));
@@ -128,9 +122,6 @@ public class HoursAdapter  extends RecyclerView.Adapter<HoursAdapter.ViewHolder>
                 previousTime = Calendar.getInstance();
                 previousTime.set(Calendar.HOUR_OF_DAY, Integer.parseInt(endTime.split(":")[0]));
                 previousTime.set(Calendar.MINUTE, Integer.parseInt(endTime.split(":")[1].split(" ")[0]));
-                previousTime.set(Calendar.AM_PM,
-                        endTime.split(":")[1].split(" ")[1].toLowerCase().equals("am")?Calendar.AM:Calendar.PM
-                        );
 
             }
             if (position < businessHourList.size()-1 ) {
@@ -140,9 +131,6 @@ public class HoursAdapter  extends RecyclerView.Adapter<HoursAdapter.ViewHolder>
                 nextStartTime = Calendar.getInstance();
                 nextStartTime.set(Calendar.HOUR_OF_DAY, Integer.parseInt(startTime.split(":")[0]));
                 nextStartTime.set(Calendar.MINUTE, Integer.parseInt(startTime.split(":")[1].split(" ")[0]));
-                nextStartTime.set(Calendar.AM_PM,
-                        startTime.split(":")[1].split(" ")[1].toLowerCase().equals("am")?Calendar.AM:Calendar.PM
-                );
 
             }
 
@@ -172,7 +160,7 @@ public class HoursAdapter  extends RecyclerView.Adapter<HoursAdapter.ViewHolder>
                     BusinessDaysAdapter.sdf.format(endTime.getTime())));
             this.notifyDataSetChanged();
 
-        }, mcurrentTime.get(Calendar.HOUR_OF_DAY), mcurrentTime.get(Calendar.MINUTE), false);
+        }, mcurrentTime.get(Calendar.HOUR_OF_DAY), mcurrentTime.get(Calendar.MINUTE), true);
         timePickerDialog.setTitle("Select Start Time");
         timePickerDialog.show();
     }
@@ -181,9 +169,6 @@ public class HoursAdapter  extends RecyclerView.Adapter<HoursAdapter.ViewHolder>
         Calendar mcurrentTime = Calendar.getInstance();
         mcurrentTime.set(Calendar.HOUR_OF_DAY, Integer.parseInt(currentTime.split(":")[0]));
         mcurrentTime.set(Calendar.MINUTE, Integer.parseInt(currentTime.split(":")[1].split(" ")[0]));
-        mcurrentTime.set(Calendar.AM_PM,
-                currentTime.split(":")[1].split(" ")[1].toLowerCase().equals("am")?Calendar.AM:Calendar.PM
-        );
         TimePickerDialog timePickerDialog = new TimePickerDialog(context, (timePicker, selectedHour, selectedMinute) -> {
 
             Log.i("selected hour", String.valueOf(selectedHour));
@@ -199,9 +184,6 @@ public class HoursAdapter  extends RecyclerView.Adapter<HoursAdapter.ViewHolder>
             Calendar previousTime = Calendar.getInstance();
             previousTime.set(Calendar.HOUR_OF_DAY, Integer.parseInt(currentStartTime.split(":")[0]));
             previousTime.set(Calendar.MINUTE, Integer.parseInt(currentStartTime.split(":")[1].split(" ")[0]));
-            previousTime.set(Calendar.AM_PM,
-                    currentStartTime.split(":")[1].split(" ")[1].toLowerCase().equals("am")?Calendar.AM:Calendar.PM
-            );
 
 
             Calendar nextStartTime = null;
@@ -212,9 +194,6 @@ public class HoursAdapter  extends RecyclerView.Adapter<HoursAdapter.ViewHolder>
                 nextStartTime = Calendar.getInstance();
                 nextStartTime.set(Calendar.HOUR_OF_DAY, Integer.parseInt(startTime.split(":")[0]));
                 nextStartTime.set(Calendar.MINUTE, Integer.parseInt(startTime.split(":")[1].split(" ")[0]));
-                nextStartTime.set(Calendar.AM_PM,
-                        startTime.split(":")[1].split(" ")[1].toLowerCase().equals("am")?Calendar.AM:Calendar.PM
-                );
 
             }
 
@@ -240,7 +219,7 @@ public class HoursAdapter  extends RecyclerView.Adapter<HoursAdapter.ViewHolder>
                     BusinessDaysAdapter.sdf.format(newEndTime.getTime())));
             this.notifyDataSetChanged();
 
-        }, mcurrentTime.get(Calendar.HOUR_OF_DAY), mcurrentTime.get(Calendar.MINUTE), false);
+        }, mcurrentTime.get(Calendar.HOUR_OF_DAY), mcurrentTime.get(Calendar.MINUTE), true);
         timePickerDialog.setTitle("Select End Time");
         timePickerDialog.show();
     }
