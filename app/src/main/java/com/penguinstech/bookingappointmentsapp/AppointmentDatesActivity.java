@@ -266,9 +266,6 @@ public class AppointmentDatesActivity extends AppCompatActivity {
                                     startOfNextDayHour.set(Calendar.MINUTE, 0);
                                     startOfNextDayHour.set(Calendar.SECOND, 0);
                                     Calendar startTime = createTime(hour.getStartTime(), startHouOfSelectedCalendar);
-                                    Log.i("startOfNextDayHour", FORMAT.format(startOfNextDayHour.getTime()));
-                                    Log.i("startTime", FORMAT.format(startTime.getTime()));
-                                    Log.i("startHour", FORMAT.format(startHouOfSelectedCalendar.getTime()));
                                     if (startTime.compareTo(startHouOfSelectedCalendar) > 0 && startTime.compareTo(startOfNextDayHour) < 0) {
 
                                         Calendar sTime = createTime(hour.getStartTime(), startHouOfSelectedCalendar);
@@ -294,6 +291,9 @@ public class AppointmentDatesActivity extends AppCompatActivity {
                                     startOfDayHour.set(Calendar.HOUR_OF_DAY, 0);
                                     startOfDayHour.set(Calendar.MINUTE, 0);
                                     startOfDayHour.set(Calendar.SECOND, 0);
+                                    Log.i("startOfDayHour", FORMAT.format(startOfDayHour.getTime()));
+                                    Log.i("startTime", FORMAT.format(startTime.getTime()));
+                                    Log.i("endHour", FORMAT.format(endHourOfSelectedCalendar.getTime()));
                                     if (startTime.compareTo(endHourOfSelectedCalendar) < 0 && startTime.compareTo(startOfDayHour) > 0) {
 
                                         Calendar sTime = createTime(hour.getStartTime(), startHouOfSelectedCalendar);
@@ -349,14 +349,15 @@ public class AppointmentDatesActivity extends AppCompatActivity {
 
 
                         //change availability of the time slots
-                        Calendar endTimeOfAppointment = Calendar.getInstance(TimeZone.getTimeZone(company.getTimeZoneId()));
+                        Calendar startTimeOfAppointment = Calendar.getInstance(TimeZone.getTimeZone(company.getTimeZoneId()));
                         try {
                             FORMAT.setTimeZone(TimeZone.getTimeZone(company.getTimeZoneId()));
-                            endTimeOfAppointment.setTime(FORMAT.parse(appointment.getDate()));
+                            startTimeOfAppointment.setTime(FORMAT.parse(appointment.getDate()));
                             //add duration to time
                             String[] duration = appointment.getDuration().split(":");
                             int durationHours = (duration.length > 0)?Integer.parseInt(duration[0]):0;
                             int durationMins = (duration.length > 1)?Integer.parseInt(duration[1]):0;
+                            Calendar endTimeOfAppointment = (Calendar) startTimeOfAppointment.clone();
                             Log.i("endTimeOfAppointment", FORMAT.format(endTimeOfAppointment.getTime()));
                             endTimeOfAppointment.add(Calendar.HOUR_OF_DAY, durationHours);
                             endTimeOfAppointment.add(Calendar.MINUTE, durationMins);
@@ -368,8 +369,10 @@ public class AppointmentDatesActivity extends AppCompatActivity {
                                 String date_time = listOfAvailableSlots.get(j);
                                 Calendar endTime = Calendar.getInstance(TimeZone.getTimeZone(company.getTimeZoneId()));
                                 endTime.setTime(FORMAT.parse(date_time));
+                                Log.i("endTime", FORMAT.format(endTime.getTime()));
+                                Log.i("endTimeOfAppointment", FORMAT.format(endTimeOfAppointment.getTime()));
 
-                                if(endTimeOfAppointment.compareTo(endTime) >= 0) {
+                                if(endTimeOfAppointment.compareTo(endTime) >= 0 && endTime.compareTo(startTimeOfAppointment) >= 0) {
                                     if(newAvailableList.contains(date_time)) {
                                         //remove data
                                         newAvailableList.remove(newAvailableList.indexOf(date_time));
