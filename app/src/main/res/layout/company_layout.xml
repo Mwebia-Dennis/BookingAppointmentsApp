@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/company_layout"
+    >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/business_details"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:contentDescription="@string/business_logo"
+            android:id="@+id/business_logo"
+            android:src="@mipmap/business_avatar"
+            />
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_margin="3dp"
+            android:id="@+id/content_LL"
+            >
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:text="@string/company_name_penguins_technologies"
+                android:padding="10dp"
+                android:id="@+id/company_name_tv"
+                />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:text="@string/owner_dennis_mwebia"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:id="@+id/owner_tv"
+                />
+        </LinearLayout>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/edit"
+            android:id="@+id/editCompanyBtn"
+            android:layout_gravity="center"
+            android:background="@color/design_default_color_primary"
+            android:textColor="@color/white"
+            android:layout_margin="3dp"
+            />
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent">
+
+            <ImageButton
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:contentDescription="@string/notification"
+                android:id="@+id/notificationBadge"
+                android:layout_centerVertical="true"
+                android:src="@drawable/ic_baseline_notifications_active_24"
+                android:background="@color/design_default_color_primary"
+                android:layout_marginEnd="10dp"
+                android:layout_marginStart="2dp"
+                />
+            <TextView
+                android:id="@+id/notificationBadgeTv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@id/notificationBadge"
+                android:layout_alignEnd="@id/notificationBadge"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="-8dp"
+                android:text="@string/_0"
+                android:textColor="#FFF"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:background="@drawable/badge_circle"/>
+        </RelativeLayout>
+
+
+
+    </LinearLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/grey"
+        android:layout_below="@+id/business_details"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="5dp"
+        />
+
+</RelativeLayout>

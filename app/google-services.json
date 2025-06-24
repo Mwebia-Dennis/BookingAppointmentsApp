@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "859532308716",
+    "project_id": "appointmentbooking-963e6",
+    "storage_bucket": "appointmentbooking-963e6.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:859532308716:android:f465feb206d664da8c75c9",
+        "android_client_info": {
+          "package_name": "com.penguinstech.bookingappointmentsapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "859532308716-e30fjha9ds06ebeo2pre56agvekom3d7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAiUPGqMBEYVXlbzxhhf1iKT5_2fRZr49o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "859532308716-e30fjha9ds06ebeo2pre56agvekom3d7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
